@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -23,3 +23,35 @@ export const CreatePostSchema = createInsertSchema(Post, {
 });
 
 export * from "./auth-schema";
+
+
+export const processStatusEnum = pgEnum("ProcessStatus", ["DRAFT", "ACTIVE", "ARCHIVED"]);
+
+// Process table
+export const Process = pgTable("process", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  name: t.varchar({ length: 255 }).notNull().unique(),
+  description: t.text(), // Optional
+  status: processStatusEnum("status").notNull(),
+  flowData: t.json().notNull(),
+  createdAt: t.timestamp({ mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .notNull()
+    .$onUpdateFn(() => sql`now()`),
+}));
+
+// Node table
+export const Node = pgTable("node", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  processId: t.uuid().notNull().references(() => Process.id, { onDelete: "cascade" }),
+  type: t.varchar({ length: 128 }).notNull(),
+  data: t.json().notNull(),
+  positionX: t.real(),
+  positionY: t.real(),
+  createdAt: t.timestamp({ mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .notNull()
+    .$onUpdateFn(() => sql`now()`),
+}));

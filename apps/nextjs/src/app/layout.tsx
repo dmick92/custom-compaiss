@@ -10,6 +10,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import "~/app/globals.css";
 
 import { env } from "~/env";
+import Component from "./_components/comp-578";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -53,16 +54,18 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans text-foreground antialiased",
+          "min-h-screen flex flex-col antialiased",
           geistSans.variable,
           geistMono.variable,
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>{props.children}</TRPCReactProvider>
-          <div className="absolute bottom-4 right-4">
-            <ThemeToggle />
-          </div>
+          <TRPCReactProvider>
+            <div className="grid h-svh grid-rows-[auto_1fr]">
+              <Component />
+              {props.children}
+            </div>
+          </TRPCReactProvider>
           <Toaster />
         </ThemeProvider>
       </body>
