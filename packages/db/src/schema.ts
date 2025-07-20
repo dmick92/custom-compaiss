@@ -30,11 +30,10 @@ export const processStatusEnum = pgEnum("ProcessStatus", [
   "ARCHIVED",
 ]);
 
-// Process table
 export const Process = pgTable("process", (t) => ({
   id: t.uuid().defaultRandom().primaryKey(),
   name: t.varchar({ length: 255 }).notNull().unique(),
-  description: t.text(), // Optional
+  description: t.text(),
   status: processStatusEnum("status").notNull(),
   flowData: t.json().notNull(),
   createdAt: t
@@ -47,7 +46,6 @@ export const Process = pgTable("process", (t) => ({
     .$onUpdateFn(() => sql`now()`),
 }));
 
-// Node table
 export const Node = pgTable("node", (t) => ({
   id: t.uuid().defaultRandom().primaryKey(),
   processId: t
