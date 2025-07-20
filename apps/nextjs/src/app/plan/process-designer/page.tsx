@@ -529,26 +529,6 @@ export default function FlowDesignerPage() {
     // }
   }, [processId, flowName, nodes, edges, saveMutation]);
 
-  const handleExport = useCallback(() => {
-    const flowData = {
-      name: flowName,
-      nodes,
-      edges,
-      exportedAt: new Date().toISOString(),
-    };
-
-    const dataStr = JSON.stringify(flowData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(dataBlob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${flowName.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }, [flowName, nodes, edges]);
 
   return (
     <div className="flex h-full flex-col">
@@ -587,15 +567,6 @@ export default function FlowDesignerPage() {
             disabled={redoStack.length === 0}
           >
             <Redo2 className="mr-1 h-4 w-4" /> Redo
-          </Button>
-          <Button
-            className="flex items-center space-x-2"
-            onClick={handleExport}
-            size="sm"
-            variant="outline"
-          >
-            <Download className="h-4 w-4" />
-            <span>Export</span>
           </Button>
           <Button
             className="flex items-center space-x-2"

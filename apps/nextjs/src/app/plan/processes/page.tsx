@@ -281,7 +281,7 @@ export default function ProcessesPage() {
             <Database className="h-4 w-4" />
             <span>Load Sample Data</span>
           </Button>
-          <Link href="/process-designer">
+          <Link href="/plan/process-designer">
             <Button className="flex items-center space-x-2">
               <Plus className="h-4 w-4" />
               <span>Create New Process</span>
@@ -345,7 +345,7 @@ export default function ProcessesPage() {
               </p>
             </div>
             {!searchTerm && (
-              <Link href="/process-designer">
+              <Link href="/plan/process-designer">
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
                   Create Your First Process
@@ -497,7 +497,7 @@ export default function ProcessesPage() {
                   {/* Actions */}
                   <div className="flex items-center space-x-2 pt-2">
                     <Link
-                      href={`/process-designer?process=${encodeURIComponent(process.id)}`}
+                      href={`/plan/process-designer?process=${encodeURIComponent(process.id)}`}
                       onMouseEnter={() => {
                         void queryClient.prefetchQuery(
                           trpc.process.getById.queryOptions({ id: process.id }),

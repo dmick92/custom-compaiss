@@ -26,21 +26,96 @@ import { cn } from "~/lib/utils";
 const navigationLinks = [
   { href: "/", label: "Home" },
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/todos", label: "Todos" },
   {
-    label: "Processes",
+    label: "Plan",
     submenu: true,
     type: "description",
     items: [
       {
-        href: "/processes",
+        href: "/plan/strategies",
+        label: "Strategies",
+        description: "Browse all strategies in the library.",
+      },
+      {
+        href: "/plan/goals",
+        label: "Goals",
+        description: "Browse all goals in the library.",
+      },
+      {
+        href: "/plan/processes",
         label: "Processes",
         description: "Browse all processes in the library.",
       },
       {
-        href: "/process-designer",
+        href: "/plan/process-designer",
         label: "Process Designer",
-        description: "Design and manage custom processes.",
+        description: "Design and manage custom processes. (TO BE REMOVED FROM MENU)",
+      },
+    ],
+  },
+  {
+    label: "Enact",
+    submenu: true,
+    type: "description",
+    items: [
+      {
+        href: "/enact/projects",
+        label: "Projects",
+        description: "Browse all projects in the library.",
+      },
+      {
+        href: "/enact/communications",
+        label: "Communications",
+        description: "Browse all communications in the library.",
+      },
+      {
+        href: "/enact/tasks",
+        label: "Tasks",
+        description: "Browse all tasks in the library.",
+      },
+    ],
+  },
+  {
+    label: "Review",
+    submenu: true,
+    type: "description",
+    items: [
+      {
+        href: "/review/analysis",
+        label: "Analysis",
+        description: "Browse all analysis in the library.",
+      },
+      {
+        href: "/review/reports",
+        label: "Reports",
+        description: "Browse all reports in the library.",
+      },
+      {
+        href: "/review/dashboards",
+        label: "Dashboards",
+        description: "Browse all dashboards in the library.",
+      },
+    ],
+  },
+  {
+    label: "Adapt",
+    submenu: true,
+    type: "description",
+    items: [
+      {
+        href: "/adapt/marketplace",
+        label: "Marketplace",
+        description: "Browse all marketplace in the library.",
+      },
+      {
+        href: "/adapt/optimize",
+        label: "Optimize",
+        description: "Browse all optimize in the library.",
+      },
+      {
+        href: "/adapt/train",
+        label: "Train",
+        description: "Browse all train in the library.",
       },
     ],
   },
@@ -67,7 +142,7 @@ const navigationLinks = [
   // },
 ];
 
-export default function Component() {
+export default function Header() {
   return (
     <header className="border-b px-4 md:px-6">
       <div className="flex h-16 items-center justify-between gap-4">
@@ -149,7 +224,7 @@ export default function Component() {
                           (link.submenu &&
                             navigationLinks[index + 1]?.submenu &&
                             link.type !==
-                              navigationLinks[index + 1]?.type)) && (
+                            navigationLinks[index + 1]?.type)) && (
                           <div
                             aria-hidden="true"
                             aria-label="Separator"
@@ -225,7 +300,7 @@ export default function Component() {
 
                                   {/* Display label with description if present */}
                                   {link.type === "description" &&
-                                  "description" in item ? (
+                                    "description" in item ? (
                                     <div className="space-y-1">
                                       <div className="font-medium">
                                         {item.label}
