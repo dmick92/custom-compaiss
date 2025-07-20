@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { cn } from "@acme/ui";
-import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
+import { ThemeProvider } from "@acme/ui/theme";
 import { Toaster } from "@acme/ui/toast";
 
 import { TRPCReactProvider } from "~/trpc/react";
@@ -10,6 +10,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import "~/app/globals.css";
 
 import { env } from "~/env";
+import Component from "./_components/comp-578";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -53,16 +54,18 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans text-foreground antialiased",
+          "flex min-h-screen flex-col antialiased",
           geistSans.variable,
           geistMono.variable,
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>{props.children}</TRPCReactProvider>
-          <div className="absolute bottom-4 right-4">
-            <ThemeToggle />
-          </div>
+          <TRPCReactProvider>
+            <div className="grid h-svh grid-rows-[auto_1fr]">
+              <Component />
+              {props.children}
+            </div>
+          </TRPCReactProvider>
           <Toaster />
         </ThemeProvider>
       </body>
