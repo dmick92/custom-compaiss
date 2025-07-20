@@ -22,10 +22,10 @@ import {
 	Square,
 	X,
 } from "lucide-react";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
 	DecisionNode,
 	DelayNode,
@@ -34,6 +34,7 @@ import {
 	ProcessNode,
 	StartNode,
 } from "./nodes";
+import type { ProcessData } from "~/app/lib/process-utils";
 
 // Industry standard node types
 const nodeTypes: NodeTypes = {
@@ -224,7 +225,7 @@ function PropertiesPanel({
 							onUpdateNode(selectedNode.id, { description: e.target.value })
 						}
 						placeholder="Enter node description..."
-						value={(selectedNode.data.description as string) || ""}
+						value={(selectedNode.data.description as string)}
 					/>
 				</div>
 
@@ -234,7 +235,7 @@ function PropertiesPanel({
 						className="mt-1 bg-muted"
 						disabled
 						id="node-type"
-						value={selectedNode.type || ""}
+						value={selectedNode.type}
 					/>
 				</div>
 
@@ -279,14 +280,16 @@ export default function ProcessDesigner() {
 			try {
 				const savedProcess = localStorage.getItem("savedProcess");
 				if (savedProcess) {
-					const processData = JSON.parse(savedProcess);
+					const processData = JSON.parse(savedProcess) as ProcessData;
 					if (processData.name === decodeURIComponent(loadProcessName)) {
-						setNodes(processData.nodes);
-						setEdges(processData.edges);
+						setNodes(processData.nodes as Node[]);
+						setEdges(processData.edges as Edge[]);
 						setProcessName(processData.name);
 					}
 				}
-			} catch (_error) {}
+			} catch {
+				return;
+			}
 		}
 	}, [setNodes, setEdges]);
 
@@ -327,7 +330,7 @@ export default function ProcessDesigner() {
 						return {
 							...node,
 							data: { ...node.data, ...updates },
-							position: updates.position || node.position,
+							position: updates.position ?? node.position,
 						};
 					}
 					return node;

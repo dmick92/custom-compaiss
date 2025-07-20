@@ -1,17 +1,17 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod/v4";
 
-import { desc, eq } from "@acme/db";
-import { CreatePostSchema, Post, Process } from "@acme/db/schema";
+import { eq } from "@acme/db";
+import { Process } from "@acme/db/schema";
 
-import { protectedProcedure, publicProcedure } from "../trpc";
+import { protectedProcedure } from "../trpc";
 
 export const processRouter = {
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  getAll: protectedProcedure.query(async ({ ctx }) => {
     const processes = await ctx.db.query.Process.findMany();
     return processes;
   }),
-  getById: publicProcedure
+  getById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
       const process = await ctx.db.query.Process.findFirst({
@@ -28,7 +28,7 @@ export const processRouter = {
         updatedAt: process.updatedAt,
       };
     }),
-  save: publicProcedure
+  save: protectedProcedure
     .input(
       z.object({
         id: z.string().nullish(),

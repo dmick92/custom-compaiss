@@ -25,8 +25,10 @@ export const loadProcesses = (): ProcessData[] => {
 		// Load from legacy key
 		const savedProcess = localStorage.getItem("savedProcess");
 		if (savedProcess) {
-			const processData = JSON.parse(savedProcess);
-			processes.push(processData);
+			const processData = safeParseProcess(savedProcess);
+			if (processData) {
+				processes.push(processData);
+			}
 		}
 
 		// Load from all process keys
@@ -34,29 +36,59 @@ export const loadProcesses = (): ProcessData[] => {
 		const processKeys = allKeys.filter((key) => key.startsWith("process_"));
 
 		for (const key of processKeys) {
-			try {
-				const processData = JSON.parse(localStorage.getItem(key) || "");
-				if (
-					processData &&
-					!processes.find((f) => f.name === processData.name)
-				) {
-					processes.push(processData);
-				}
-			} catch (_error) { }
+			const item = localStorage.getItem(key);
+			const processData = item ? safeParseProcess(item) : null;
+			if (
+				processData &&
+				!processes.find((f) => f.name === processData.name)
+			) {
+				processes.push(processData);
+			}
 		}
 
 		return processes;
-	} catch (_error) {
+	} catch {
 		return [];
 	}
 };
+
+function safeParseProcess(json: string): ProcessData | null {
+	try {
+		const obj = JSON.parse(json) as {
+			name: string;
+			nodes: unknown[];
+			edges: unknown[];
+			createdAt: string;
+			updatedAt: string;
+			description?: string | null;
+		};
+		const casted = obj as {
+			name: string;
+			nodes: unknown[];
+			edges: unknown[];
+			createdAt: string;
+			updatedAt: string;
+			description?: string | null;
+		};
+		return {
+			name: casted.name,
+			nodes: casted.nodes,
+			edges: casted.edges,
+			createdAt: casted.createdAt,
+			updatedAt: casted.updatedAt,
+			description: "description" in casted ? casted.description ?? null : null,
+		};
+	} catch {
+		return null;
+	}
+}
 
 export const deleteProcess = (processName: string) => {
 	// Remove from legacy key if it matches
 	const savedProcess = localStorage.getItem("savedProcess");
 	if (savedProcess) {
-		const processData = JSON.parse(savedProcess);
-		if (processData.name === processName) {
+		const processData = safeParseProcess(savedProcess);
+		if (processData && processData.name === processName) {
 			localStorage.removeItem("savedProcess");
 		}
 	}
@@ -66,12 +98,11 @@ export const deleteProcess = (processName: string) => {
 	const processKeys = allKeys.filter((key) => key.startsWith("process_"));
 
 	for (const key of processKeys) {
-		try {
-			const processData = JSON.parse(localStorage.getItem(key) || "");
-			if (processData && processData.name === processName) {
-				localStorage.removeItem(key);
-			}
-		} catch (_error) { }
+		const item = localStorage.getItem(key);
+		const processData = item ? safeParseProcess(item) : null;
+		if (processData && processData.name === processName) {
+			localStorage.removeItem(key);
+		}
 	}
 };
 

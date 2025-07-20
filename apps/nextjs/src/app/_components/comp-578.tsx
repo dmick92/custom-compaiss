@@ -20,6 +20,7 @@ import {
 import { cn } from "~/lib/utils";
 import { ModeToggle } from "~/app/_components/mode-toggle";
 import UserMenu from "~/app/_components/user-menu";
+import Link from "next/link";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -142,9 +143,9 @@ export default function Component() {
 												// 1. One is submenu and one is simple link OR
 												// 2. Both are submenus but with different types
 												((!link.submenu &&
-													navigationLinks[index + 1]?.submenu) ||
+													navigationLinks[index + 1]?.submenu) ??
 													(link.submenu &&
-														!navigationLinks[index + 1]?.submenu) ||
+														!navigationLinks[index + 1]?.submenu) ??
 													(link.submenu &&
 														navigationLinks[index + 1]?.submenu &&
 														link.type !== navigationLinks[index + 1]?.type)) && (
@@ -166,9 +167,9 @@ export default function Component() {
 					</Popover>
 					{/* Main nav */}
 					<div className="flex items-center gap-6">
-						<a className="text-primary hover:text-primary/90" href="/">
+						<Link className="text-primary hover:text-primary/90" href="/">
 							<Logo />
-						</a>
+						</Link>
 						{/* Navigation menu */}
 						<NavigationMenu className="max-md:hidden" viewport={false}>
 							<NavigationMenuList className="gap-2">

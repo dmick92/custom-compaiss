@@ -1,6 +1,7 @@
 "use client";
 
-import { Background, type Edge, type Node, ReactFlow } from "@xyflow/react";
+import { Background, ReactFlow } from "@xyflow/react";
+import type { Edge, Node } from "@xyflow/react";
 import {
 	Calendar,
 	Database,
@@ -20,9 +21,10 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { getProcessOverview, type ProcessData } from "~/app/lib/process-utils";
+import { getProcessOverview } from "~/app/lib/process-utils";
+import type { ProcessData } from "~/app/lib/process-utils";
 import "@xyflow/react/dist/style.css";
-import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	DecisionNode,
 	DelayNode,
@@ -32,7 +34,7 @@ import {
 	StartNode,
 } from "~/app/_components/flow-designer/nodes";
 import { useTRPC } from "~/trpc/react";
-import { RouterOutputs } from "@acme/api";
+import type { RouterOutputs } from "@acme/api";
 
 type Process = RouterOutputs["process"]["getAll"][number];
 
@@ -239,7 +241,7 @@ export default function ProcessesPage() {
 				process.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
 				process.description?.toLowerCase().includes(searchTerm.toLowerCase())
 		);
-		setFilteredProcesses(filtered || []);
+		setFilteredProcesses(filtered ?? []);
 	}, [processes, searchTerm]);
 
 	const formatDate = (dateString: string) => {
@@ -349,17 +351,11 @@ export default function ProcessesPage() {
 				</Card>
 			) : (
 				<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-					{filteredProcesses?.map((process: Process, index: number) => {
+					{filteredProcesses.map((process: Process, index: number) => {
 						// Use flowData for nodes/edges preview if available
-						const flowData = process.flowData as unknown as {
-							nodes?: Node[];
-							edges?: Edge[];
-						};
-						const nodes = flowData?.nodes || [];
-						const edges = flowData?.edges || [];
-						if (!(nodes && edges)) {
-							return null; // skip invalid
-						}
+						const flowData = process.flowData as { nodes?: Node[]; edges?: Edge[] };
+						const nodes = flowData.nodes ?? [];
+						const edges = flowData.edges ?? [];
 						const overview = getProcessOverview({
 							name: process.name,
 							description: process.description,
@@ -376,7 +372,7 @@ export default function ProcessesPage() {
 										<div className="flex-1">
 											<CardTitle className="text-lg">{process.name}</CardTitle>
 											<p className="mt-1 text-muted-foreground text-sm">
-												{process.description || "No description provided"}
+												{process.description ?? "No description provided"}
 											</p>
 										</div>
 										<Badge
@@ -491,14 +487,14 @@ export default function ProcessesPage() {
 										<Link
 											href={`/process-designer?process=${encodeURIComponent(process.id)}`}
 											onMouseEnter={() => {
-												queryClient.prefetchQuery(
+												void queryClient.prefetchQuery(
 													trpc.process.getById.queryOptions(
 														{ id: process.id },
 													)
 												);
 											}}
 											onFocus={() => {
-												queryClient.prefetchQuery(
+												void queryClient.prefetchQuery(
 													trpc.process.getById.queryOptions(
 														{ id: process.id },
 													)

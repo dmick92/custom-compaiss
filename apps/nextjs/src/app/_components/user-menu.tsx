@@ -41,7 +41,7 @@ export default function UserMenu() {
 					<Button
 						className="w-full"
 						onClick={() => {
-							authClient.signOut({
+							void authClient.signOut({
 								fetchOptions: {
 									onSuccess: () => {
 										router.push("/");

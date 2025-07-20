@@ -1,5 +1,5 @@
 import { Handle, Position } from "@xyflow/react";
-import { Circle, Clock, Diamond, Settings, Square, Play, Cog, File, HelpCircle } from "lucide-react";
+import { Clock, Square, Play, Cog, File, HelpCircle } from "lucide-react";
 
 // Start/End Node (Circle)
 export function StartNode({ data }: { data: { label: string } }) {

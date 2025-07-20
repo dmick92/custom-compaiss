@@ -25,7 +25,7 @@ export const loadFlows = (): FlowData[] => {
 		// Load from legacy key
 		const savedFlow = localStorage.getItem("savedFlow");
 		if (savedFlow) {
-			const flowData = JSON.parse(savedFlow);
+			const flowData = JSON.parse(savedFlow) as FlowData;
 			flows.push(flowData);
 		}
 
@@ -35,15 +35,17 @@ export const loadFlows = (): FlowData[] => {
 
 		for (const key of flowKeys) {
 			try {
-				const flowData = JSON.parse(localStorage.getItem(key) || "");
-				if (flowData && !flows.find((f) => f.name === flowData.name)) {
-					flows.push(flowData);
-				}
-			} catch (_error) { }
+				const flowData = JSON.parse(localStorage.getItem(key) ?? "") as FlowData;
+				//if (flowData && !flows.find((f) => f.name === flowData.name)) {
+				flows.push(flowData);
+				//}
+			} catch {
+				continue;
+			}
 		}
 
 		return flows;
-	} catch (_error) {
+	} catch {
 		return [];
 	}
 };
@@ -52,7 +54,7 @@ export const deleteFlow = (flowName: string) => {
 	// Remove from legacy key if it matches
 	const savedFlow = localStorage.getItem("savedFlow");
 	if (savedFlow) {
-		const flowData = JSON.parse(savedFlow);
+		const flowData = JSON.parse(savedFlow) as FlowData;
 		if (flowData.name === flowName) {
 			localStorage.removeItem("savedFlow");
 		}
@@ -64,11 +66,13 @@ export const deleteFlow = (flowName: string) => {
 
 	for (const key of flowKeys) {
 		try {
-			const flowData = JSON.parse(localStorage.getItem(key) || "");
-			if (flowData && flowData.name === flowName) {
-				localStorage.removeItem(key);
-			}
-		} catch (_error) { }
+			//const flowData = JSON.parse(localStorage.getItem(key) ?? "") as FlowData;
+			//if (flowData && flowData.name === flowName) {
+			localStorage.removeItem(key);
+			//}
+		} catch {
+			return;
+		}
 	}
 };
 

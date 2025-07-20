@@ -55,57 +55,6 @@ const nodeTypes: NodeTypes = {
     delay: DelayNode,
 };
 
-// Header component for flow management
-function FlowHeader({
-    flowName,
-    onFlowNameChange,
-    onSave,
-    onExport,
-}: {
-    flowName: string;
-    onFlowNameChange: (name: string) => void;
-    onSave: () => void;
-    onExport: () => void;
-}) {
-    return (
-        <div className="flex h-16 items-center justify-between border-b bg-background px-6">
-            <div className="flex items-center space-x-4">
-                <h1 className="font-semibold text-lg">Flow Designer</h1>
-                <div className="flex items-center space-x-2">
-                    <Label className="font-medium text-sm" htmlFor="flow-name">
-                        Flow Name:
-                    </Label>
-                    <Input
-                        className="w-48"
-                        id="flow-name"
-                        onChange={(e) => onFlowNameChange(e.target.value)}
-                        placeholder="Enter flow name..."
-                        value={flowName}
-                    />
-                </div>
-            </div>
-            <div className="flex items-center space-x-2">
-                <Button
-                    className="flex items-center"
-                    onClick={onExport}
-                    size="sm"
-                    variant="outline"
-                >
-                    <Download className="h-4 w-4" />
-                    <span>Export</span>
-                </Button>
-                <Button
-                    className="flex items-center space-x-2"
-                    onClick={onSave}
-                    size="sm"
-                >
-                    <Save className="h-4 w-4" />
-                    <span>Save Flow</span>
-                </Button>
-            </div>
-        </div>
-    );
-}
 
 // Node palette component
 function NodePalette({
@@ -236,7 +185,7 @@ function PropertiesPanel({
                             onUpdateNode(selectedNode.id, { description: e.target.value })
                         }
                         placeholder="Enter node description..."
-                        value={(selectedNode.data.description as string) || ""}
+                        value={(selectedNode.data.description as string)}
                     />
                 </div>
 
@@ -246,7 +195,7 @@ function PropertiesPanel({
                         className="mt-1 bg-muted"
                         disabled
                         id="node-type"
-                        value={selectedNode.type || ""}
+                        value={selectedNode.type}
                     />
                 </div>
 
@@ -288,11 +237,11 @@ function EdgePropertiesPanel({
     onDeleteEdge: (edgeId: string) => void;
     onClose: () => void;
 }) {
-    const [label, setLabel] = useState<string>(selectedEdge.label as string || "");
+    const [label, setLabel] = useState<string>(selectedEdge.label as string);
 
     // Sync local label state when selectedEdge changes
     useEffect(() => {
-        setLabel(selectedEdge.label as string || "");
+        setLabel(selectedEdge.label as string);
     }, [selectedEdge]);
 
     return (
@@ -371,27 +320,27 @@ export default function FlowDesignerPage() {
     const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
     const [flowName, setFlowName] = useState<string>("Untitled Flow");
     // Undo/Redo stacks
-    const [undoStack, setUndoStack] = useState<Array<{ nodes: Node[]; edges: Edge[] }>>([]);
-    const [redoStack, setRedoStack] = useState<Array<{ nodes: Node[]; edges: Edge[] }>>([]);
+    const [undoStack, setUndoStack] = useState<{ nodes: Node[]; edges: Edge[] }[]>([]);
+    const [redoStack, setRedoStack] = useState<{ nodes: Node[]; edges: Edge[] }[]>([]);
 
     const searchParams = useSearchParams();
     const processId = searchParams.get("process");
     const { data: processData } = useQuery(
         trpc.process.getById.queryOptions(
-            { id: processId || "" },
+            { id: processId ?? "" },
             { enabled: !!processId }
         )
     );
 
     useEffect(() => {
         if (processData) {
-            setFlowName(processData.name || "Untitled Flow");
+            setFlowName(processData.name);
             const flowData = processData.flowData as Record<string, unknown> as {
                 nodes?: Node[];
                 edges?: Edge[];
             };
-            setNodes(flowData.nodes || []);
-            setEdges(flowData.edges || []);
+            setNodes(flowData.nodes ?? []);
+            setEdges(flowData.edges ?? []);
         }
     }, [processData, setEdges, setNodes]);
 
@@ -489,7 +438,7 @@ export default function FlowDesignerPage() {
                         return {
                             ...node,
                             data: { ...node.data, ...updates },
-                            position: updates.position || node.position,
+                            position: updates.position ?? node.position,
                         };
                     }
                     return node;
