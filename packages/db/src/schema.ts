@@ -24,8 +24,11 @@ export const CreatePostSchema = createInsertSchema(Post, {
 
 export * from "./auth-schema";
 
-
-export const processStatusEnum = pgEnum("ProcessStatus", ["DRAFT", "ACTIVE", "ARCHIVED"]);
+export const processStatusEnum = pgEnum("ProcessStatus", [
+  "DRAFT",
+  "ACTIVE",
+  "ARCHIVED",
+]);
 
 // Process table
 export const Process = pgTable("process", (t) => ({
@@ -34,7 +37,10 @@ export const Process = pgTable("process", (t) => ({
   description: t.text(), // Optional
   status: processStatusEnum("status").notNull(),
   flowData: t.json().notNull(),
-  createdAt: t.timestamp({ mode: "date", withTimezone: true }).defaultNow().notNull(),
+  createdAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
   updatedAt: t
     .timestamp({ mode: "date", withTimezone: true })
     .notNull()
@@ -44,12 +50,18 @@ export const Process = pgTable("process", (t) => ({
 // Node table
 export const Node = pgTable("node", (t) => ({
   id: t.uuid().defaultRandom().primaryKey(),
-  processId: t.uuid().notNull().references(() => Process.id, { onDelete: "cascade" }),
+  processId: t
+    .uuid()
+    .notNull()
+    .references(() => Process.id, { onDelete: "cascade" }),
   type: t.varchar({ length: 128 }).notNull(),
   data: t.json().notNull(),
   positionX: t.real(),
   positionY: t.real(),
-  createdAt: t.timestamp({ mode: "date", withTimezone: true }).defaultNow().notNull(),
+  createdAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
   updatedAt: t
     .timestamp({ mode: "date", withTimezone: true })
     .notNull()

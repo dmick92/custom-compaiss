@@ -34,10 +34,10 @@ export const processRouter = {
         id: z.string().nullish(),
         name: z.string(),
         flowData: z.any(), // expects {nodes, edges, ...}
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
-      let res = null
+      let res = null;
       if (input.id) {
         // Update existing process
         const updated = await ctx.db
