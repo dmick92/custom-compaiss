@@ -122,6 +122,33 @@ export default function SignInForm({
         </form.Subscribe>
       </form>
 
+      {/* Button to sign in as test user */}
+      <div className="mt-2">
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={async () => {
+            // Preconfigured test credentials
+            const testEmail = "test@test.com";
+            const testPassword = "password";
+            await authClient.signIn.email(
+              { email: testEmail, password: testPassword },
+              {
+                onSuccess: () => {
+                  router.push("/dashboard");
+                  toast.success("Signed in as test user");
+                },
+                onError: (error) => {
+                  toast.error(error.error.message);
+                },
+              },
+            );
+          }}
+        >
+          Sign in as Test User
+        </Button>
+      </div>
+
       <div className="mt-4 text-center">
         <Button
           className="text-indigo-600 hover:text-indigo-800"
