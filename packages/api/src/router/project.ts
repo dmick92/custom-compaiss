@@ -33,6 +33,7 @@ export const projectRouter = {
       processId: z.string(),
       name: z.string().optional(),
       description: z.string().optional(),
+      priority: z.enum(["Lowest", "Low", "Medium", "High", "Critical"]).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
       const process = await ctx.db.query.Process.findFirst({
@@ -47,6 +48,7 @@ export const projectRouter = {
         description: input.description || process.description,
         flowData: process.flowData,
         status: "ACTIVE",
+        priority: input.priority || "Medium",
         createdAt: new Date(),
         updatedAt: new Date(),
       }).returning();

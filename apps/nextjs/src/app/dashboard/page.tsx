@@ -3,7 +3,7 @@
 import React from 'react'
 import { ChangeBadgeVariantInput } from '~/calendar/components/change-badge-variant-input'
 import { ClientContainer } from '~/calendar/components/client-container'
-import { CalendarProvider, useCalendar } from '~/calendar/contexts/calendar-context'
+import { useCalendar } from '~/calendar/contexts/calendar-context'
 
 const page = () => {
     const { view } = useCalendar();

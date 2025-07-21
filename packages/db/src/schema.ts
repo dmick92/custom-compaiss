@@ -66,6 +66,13 @@ export const Node = pgTable("node", (t) => ({
     .$onUpdateFn(() => sql`now()`),
 }));
 
+export const projectPriorityEnum = pgEnum("ProjectPriority", [
+  "Lowest",
+  "Low",
+  "Medium",
+  "High",
+  "Critical",
+]);
 
 export const Project = pgTable("project", (t) => ({
   id: t.uuid().defaultRandom().primaryKey(),
@@ -73,6 +80,7 @@ export const Project = pgTable("project", (t) => ({
   description: t.text(),
   status: processStatusEnum("status").notNull(),
   flowData: t.json().notNull(),
+  priority: projectPriorityEnum("priority").notNull().default("Medium"),
   createdAt: t
     .timestamp({ mode: "date", withTimezone: true })
     .defaultNow()
