@@ -1,7 +1,8 @@
 "use client";
 
+import { Suspense } from "react";
+
 import type { Connection, Edge, Node, NodeTypes } from "@xyflow/react";
-import { useCallback, useEffect, useState } from "react";
 import {
   addEdge,
   Background,
@@ -42,6 +43,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useTRPC } from "~/trpc/react";
+import { useCallback, useEffect, useState } from "react";
 
 // Industry standard node types
 const nodeTypes: NodeTypes = {
@@ -309,7 +311,7 @@ function EdgePropertiesPanel({
   );
 }
 
-export default function FlowDesignerPage() {
+function FlowDesignerContent() {
   const trpc = useTRPC();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -643,5 +645,13 @@ export default function FlowDesignerPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function FlowDesignerPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <FlowDesignerContent />
+    </Suspense>
   );
 }
