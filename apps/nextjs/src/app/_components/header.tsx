@@ -21,6 +21,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
+import { env } from "~/env";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -45,11 +46,6 @@ const navigationLinks = [
         href: "/plan/processes",
         label: "Processes",
         description: "Browse all processes in the library.",
-      },
-      {
-        href: "/plan/process-designer",
-        label: "Process Designer",
-        description: "Design and manage custom processes. (TO BE REMOVED FROM MENU)",
       },
     ],
   },
@@ -140,6 +136,22 @@ const navigationLinks = [
   //     { href: "#", label: "About Us", icon: "InfoIcon" },
   //   ],
   // },
+];
+
+const devLinks = [
+  {
+    label: "Dev",
+    submenu: true,
+    type: "description",
+    items: [
+      {
+        href: "/plan/process-designer",
+        label: "Process Designer",
+        description: "Design and manage custom processes. (TO BE REMOVED FROM MENU)",
+      },
+    ],
+  },
+
 ];
 
 export default function Header() {
@@ -339,6 +351,49 @@ export default function Header() {
         </div>
         {/* Right side */}
         <div className="flex items-center gap-2">
+          {env.NODE_ENV === "development" && (
+            <NavigationMenu className="max-md:hidden" viewport={false}>
+              <NavigationMenuList className="gap-2">
+                {devLinks.map((link, index) => (
+                  <NavigationMenuItem key={index}>
+
+                    <>
+                      <NavigationMenuTrigger className="text-muted-foreground hover:text-primary bg-transparent px-2 py-1.5 font-medium *:[svg]:-me-0.5 *:[svg]:size-3.5">
+                        {link.label}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent className="data-[motion=from-end]:slide-in-from-right-16! data-[motion=from-start]:slide-in-from-left-16! data-[motion=to-end]:slide-out-to-right-16! data-[motion=to-start]:slide-out-to-left-16! z-50 p-1">
+                        <ul
+                          className={cn(
+                            link.type === "description"
+                              ? "min-w-64"
+                              : "min-w-48",
+                          )}
+                        >
+                          {link.items.map((item, itemIndex) => (
+                            <li key={itemIndex}>
+                              <NavigationMenuLink
+                                className="py-1.5"
+                                href={item.href}
+                              >
+                                <div className="space-y-1">
+                                  <div className="font-medium">
+                                    {item.label}
+                                  </div>
+                                  <p className="text-muted-foreground line-clamp-2 text-xs">
+                                    {item.description}
+                                  </p>
+                                </div>
+                              </NavigationMenuLink>
+                            </li>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
+          )}
           <ModeToggle />
           <UserMenu />
         </div>
