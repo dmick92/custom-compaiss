@@ -110,6 +110,7 @@ function PropertiesPanel({
   onDeleteNode: (nodeId: string) => void;
   onClose: () => void;
 }) {
+  const isStartNode = selectedNode.type === "start";
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -215,6 +216,7 @@ function PropertiesPanel({
             onClick={() => onDeleteNode(selectedNode.id)}
             size="sm"
             variant="destructive"
+            disabled={isStartNode}
           >
             Delete Node
           </Button>
@@ -335,6 +337,7 @@ function FlowDesignerContent() {
     ),
   );
 
+  // Ensure a new process always starts with a start node
   useEffect(() => {
     if (processData) {
       setFlowName(processData.name);
@@ -344,6 +347,20 @@ function FlowDesignerContent() {
       };
       setNodes(flowData.nodes ?? []);
       setEdges(flowData.edges ?? []);
+    } else {
+      setNodes((prev) => {
+        if (prev.length === 0) {
+          return [
+            {
+              id: `start-${Date.now()}`,
+              type: "start",
+              position: { x: 100, y: 100 },
+              data: { label: "Start" },
+            },
+          ];
+        }
+        return prev;
+      });
     }
   }, [processData, setEdges, setNodes]);
 
@@ -460,9 +477,14 @@ function FlowDesignerContent() {
 
   const deleteNode = useCallback(
     (nodeId: string) => {
-      setNodesWithHistory((nds: Node[]) =>
-        nds.filter((node: Node) => node.id !== nodeId),
-      );
+      setNodesWithHistory((nds: Node[]) => {
+        const nodeToDelete = nds.find((node: Node) => node.id === nodeId);
+        if (nodeToDelete && nodeToDelete.type === "start") {
+          // Prevent deletion of start node
+          return nds;
+        }
+        return nds.filter((node: Node) => node.id !== nodeId);
+      });
       setEdgesWithHistory((eds: Edge[]) =>
         eds.filter(
           (edge: Edge) => edge.source !== nodeId && edge.target !== nodeId,
