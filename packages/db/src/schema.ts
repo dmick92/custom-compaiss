@@ -46,26 +46,6 @@ export const Process = pgTable("process", (t) => ({
     .$onUpdateFn(() => sql`now()`),
 }));
 
-export const Node = pgTable("node", (t) => ({
-  id: t.uuid().defaultRandom().primaryKey(),
-  processId: t
-    .uuid()
-    .notNull()
-    .references(() => Process.id, { onDelete: "cascade" }),
-  type: t.varchar({ length: 128 }).notNull(),
-  data: t.json().notNull(),
-  positionX: t.real(),
-  positionY: t.real(),
-  createdAt: t
-    .timestamp({ mode: "date", withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: t
-    .timestamp({ mode: "date", withTimezone: true })
-    .notNull()
-    .$onUpdateFn(() => sql`now()`),
-}));
-
 export const projectPriorityEnum = pgEnum("ProjectPriority", [
   "Lowest",
   "Low",

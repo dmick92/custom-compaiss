@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Background, ReactFlow } from "@xyflow/react";
 import { Calendar, Edit, Eye, Loader2, Share2, Trash2 } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
@@ -19,6 +18,9 @@ import {
 } from "./flow-designer/nodes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "~/trpc/react";
+import "@xyflow/react/dist/style.css";
+import { PriorityBadge } from "./priority";
+
 
 const nodeTypes = {
     start: StartNode,
@@ -76,17 +78,7 @@ export function ProjectCard({
                             {project.description ?? "No description provided"}
                         </p>
                     </div>
-                    <Badge
-                        variant={
-                            overview.complexity === "High"
-                                ? "destructive"
-                                : overview.complexity === "Medium"
-                                    ? "default"
-                                    : "secondary"
-                        }
-                    >
-                        {overview.complexity}
-                    </Badge>
+                    <PriorityBadge priority={project.priority} />
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
