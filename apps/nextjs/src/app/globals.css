@@ -201,15 +201,27 @@ main {
 
 /* XYFlow Controls Dark Mode Overrides */
 .dark .react-flow__controls {
-  background: #18181b;
-  border-color: #27272a;
+  background: var(--background);
+  border-color: var(--border);
 }
 .dark .react-flow__controls-button {
-  background: #27272a;
-  color: #f4f4f5;
-  border-color: #3f3f46;
+  background: var(--muted);
+  color: var(--primary);
 }
 .dark .react-flow__controls-button:hover {
-  background: #3f3f46;
-  color: #a5b4fc;
+  background: var(--primary);
+  color: var(--background);
+}
+
+.dark .react-flow__minimap-svg {
+  background: var(--background) !important;
+  border-color: var(--border) !important;
+}
+.dark .react-flow__minimap-node {
+  fill: var(--muted) !important;
+  stroke: var(--border) !important;
+}
+.dark .react-flow__minimap-mask {
+  fill: color-mix(in srgb, var(--muted) 50%, var(--background) 50%) !important;
+  stroke: color-mix(in srgb, var(--border) 50%, var(--background) 50%) !important;
 }

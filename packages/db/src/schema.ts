@@ -65,3 +65,40 @@ export const Node = pgTable("node", (t) => ({
     .notNull()
     .$onUpdateFn(() => sql`now()`),
 }));
+
+
+export const Project = pgTable("project", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  name: t.varchar({ length: 255 }).notNull().unique(),
+  description: t.text(),
+  status: processStatusEnum("status").notNull(),
+  flowData: t.json().notNull(),
+  createdAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .notNull()
+    .$onUpdateFn(() => sql`now()`),
+}));
+
+export const Task = pgTable("task", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  projectId: t
+    .uuid()
+    .notNull()
+    .references(() => Project.id, { onDelete: "cascade" }),
+  type: t.varchar({ length: 128 }).notNull(),
+  data: t.json().notNull(),
+  positionX: t.real(),
+  positionY: t.real(),
+  createdAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .notNull()
+    .$onUpdateFn(() => sql`now()`),
+}));

@@ -10,7 +10,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import "~/app/globals.css";
 
 import { env } from "~/env";
-import Component from "./_components/comp-578";
+import Header from "./_components/header";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -62,7 +62,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <TRPCReactProvider>
             <div className="grid h-svh grid-rows-[auto_1fr]">
-              <Component />
+              <Header />
               {props.children}
             </div>
           </TRPCReactProvider>
