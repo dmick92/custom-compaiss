@@ -65,7 +65,7 @@ import { ProjectCard } from "~/app/_components/project-card";
 import { DatePickerWithInput } from "~/components/ui/datepicker-with-input";
 import { Textarea } from "~/components/ui/textarea";
 
-type Project = RouterOutputs["project"]["getAll"][number];
+type Project = RouterOutputs["project"]["getAll"][number] & { priority?: string };
 
 // Node types for the mini process preview
 const nodeTypes = {
@@ -90,7 +90,7 @@ export default function ProjectsPage() {
       setIsModalOpen(false);
       setDialogStep(1);
       setSelectedProcessId(null);
-      setProjectMetadata({ name: "", description: "" });
+      setProjectMetadata({ name: "", description: "", priority: "Medium" });
     },
   }));
   const process = useQuery(trpc.process.getAll.queryOptions());
@@ -98,7 +98,7 @@ export default function ProjectsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProcessId, setSelectedProcessId] = useState<string | null>(null);
   const [dialogStep, setDialogStep] = useState(1);
-  const [projectMetadata, setProjectMetadata] = useState({ name: "", description: "" });
+  const [projectMetadata, setProjectMetadata] = useState({ name: "", description: "", priority: "Medium" });
   const [taskAssignments, setTaskAssignments] = useState<Record<string, string>>({});
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -116,7 +116,7 @@ export default function ProjectsPage() {
     if (!isModalOpen) {
       setDialogStep(1);
       setSelectedProcessId(null);
-      setProjectMetadata({ name: "", description: "" });
+      setProjectMetadata({ name: "", description: "", priority: "Medium" });
       setTaskAssignments({});
       setExpandedTasks(new Set());
     }
@@ -148,6 +148,7 @@ export default function ProjectsPage() {
         processId: selectedProcessId,
         name: projectMetadata.name,
         description: projectMetadata.description,
+        priority: projectMetadata.priority,
       });
     }
   };
@@ -251,6 +252,42 @@ export default function ProjectsPage() {
 
                   <div>
                     <DatePickerWithInput label="Project Start Date" />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="project-priority">Priority</Label>
+                    <Select
+                      value={projectMetadata.priority}
+                      onValueChange={val => setProjectMetadata(prev => ({ ...prev, priority: val }))}
+                    >
+                      <SelectTrigger className="w-full mt-2">
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Critical">
+                          <span className="inline-block w-2 h-2 rounded-full bg-purple-600 mr-2 align-middle" />
+                          Critical
+                        </SelectItem>
+                        <SelectItem value="High">
+                          <span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-2 align-middle" />
+                          High
+                        </SelectItem>
+
+                        <SelectItem value="Medium">
+                          <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 mr-2 align-middle" />
+                          Medium
+                        </SelectItem>
+                        <SelectItem value="Low">
+                          <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2 align-middle" />
+                          Low
+                        </SelectItem>
+
+                        <SelectItem value="Lowest">
+                          <span className="inline-block w-2 h-2 rounded-full bg-gray-400 mr-2 align-middle" />
+                          Lowest
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div>
