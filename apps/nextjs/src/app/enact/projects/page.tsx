@@ -1,32 +1,20 @@
 "use client";
 
-import type { Edge, Node } from "@xyflow/react";
-import { useEffect, useState, useRef } from "react";
-import Link from "next/link";
-import { Background, ReactFlow } from "@xyflow/react";
+import { useEffect, useState } from "react";
 import {
-  Calendar,
-  Database,
-  Edit,
-  Eye,
   FileText,
   Plus,
   Search,
-  Share2,
-  Trash2,
   ChevronDown,
   ChevronRight,
   Clock,
   User,
   Tag,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 
-import type { ProcessData } from "~/app/lib/process-utils";
-import { getProcessOverview } from "~/app/lib/process-utils";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
@@ -45,7 +33,6 @@ import {
   DialogClose,
 } from "~/components/ui/dialog";
 
-import "@xyflow/react/dist/style.css";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -64,8 +51,9 @@ import { ProcessCard } from "~/app/_components/process-card";
 import { ProjectCard } from "~/app/_components/project-card";
 import { DatePickerWithInput } from "~/components/ui/datepicker-with-input";
 import { Textarea } from "~/components/ui/textarea";
+import { PrioritySelectOptions } from "~/app/_components/priority";
 
-type Project = RouterOutputs["project"]["getAll"][number] & { priority?: string };
+type Project = RouterOutputs["project"]["getAll"][number]
 
 // Node types for the mini process preview
 const nodeTypes = {
@@ -98,7 +86,7 @@ export default function ProjectsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProcessId, setSelectedProcessId] = useState<string | null>(null);
   const [dialogStep, setDialogStep] = useState(1);
-  const [projectMetadata, setProjectMetadata] = useState({ name: "", description: "", priority: "Medium" });
+  const [projectMetadata, setProjectMetadata] = useState({ name: "", description: "", priority: "Medium" as "Lowest" | "Low" | "Medium" | "High" | "Critical" });
   const [taskAssignments, setTaskAssignments] = useState<Record<string, string>>({});
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -124,22 +112,12 @@ export default function ProjectsPage() {
 
   const handleNextStep = () => {
     if (selectedProcessId) {
-      setDialogStep(2);
+      setDialogStep((step) => step + 1);
     }
   };
 
   const handleBackStep = () => {
-    setDialogStep(1);
-  };
-
-  const handleNextToAssignments = () => {
-    if (projectMetadata.name.trim()) {
-      setDialogStep(3);
-    }
-  };
-
-  const handleBackToMetadata = () => {
-    setDialogStep(2);
+    setDialogStep((step) => step - 1);
   };
 
   const handleCreateProject = () => {
@@ -227,7 +205,7 @@ export default function ProjectsPage() {
                           <Label>Process Preview</Label>
                           <div className="mt-2">
                             <ProcessCard
-                              project={process.data?.find(p => p.id === selectedProcessId)!}
+                              process={process.data?.find(p => p.id === selectedProcessId)!}
                               isPreview
                             />
                           </div>
@@ -258,34 +236,13 @@ export default function ProjectsPage() {
                     <Label htmlFor="project-priority">Priority</Label>
                     <Select
                       value={projectMetadata.priority}
-                      onValueChange={val => setProjectMetadata(prev => ({ ...prev, priority: val }))}
+                      onValueChange={val => setProjectMetadata(prev => ({ ...prev, priority: val as "Lowest" | "Low" | "Medium" | "High" | "Critical" }))}
                     >
                       <SelectTrigger className="w-full mt-2">
                         <SelectValue placeholder="Select priority" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Critical">
-                          <span className="inline-block w-2 h-2 rounded-full bg-purple-600 mr-2 align-middle" />
-                          Critical
-                        </SelectItem>
-                        <SelectItem value="High">
-                          <span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-2 align-middle" />
-                          High
-                        </SelectItem>
-
-                        <SelectItem value="Medium">
-                          <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 mr-2 align-middle" />
-                          Medium
-                        </SelectItem>
-                        <SelectItem value="Low">
-                          <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2 align-middle" />
-                          Low
-                        </SelectItem>
-
-                        <SelectItem value="Lowest">
-                          <span className="inline-block w-2 h-2 rounded-full bg-gray-400 mr-2 align-middle" />
-                          Lowest
-                        </SelectItem>
+                        <PrioritySelectOptions reverse={true} />
                       </SelectContent>
                     </Select>
                   </div>
@@ -459,7 +416,7 @@ export default function ProjectsPage() {
                       Back
                     </Button>
                     <Button
-                      onClick={handleNextToAssignments}
+                      onClick={handleNextStep}
                       disabled={!projectMetadata.name.trim()}
                     >
                       Next
@@ -467,7 +424,7 @@ export default function ProjectsPage() {
                   </>
                 ) : (
                   <>
-                    <Button variant="outline" onClick={handleBackToMetadata}>
+                    <Button variant="outline" onClick={handleBackStep}>
                       Back
                     </Button>
                     <Button

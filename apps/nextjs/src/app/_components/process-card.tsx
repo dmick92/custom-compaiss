@@ -30,26 +30,26 @@ const nodeTypes = {
 };
 
 export function ProcessCard({
-    project,
+    process,
     isPreview = false,
 }: {
-    project: RouterOutputs["process"]["getAll"][number];
+    process: RouterOutputs["process"]["getAll"][number];
     isPreview?: boolean;
 }) {
     const queryClient = useQueryClient();
     const trpc = useTRPC();
 
     const { theme } = useTheme();
-    const flowData = project.flowData as { nodes?: Node[]; edges?: Edge[] };
+    const flowData = process.flowData as { nodes?: Node[]; edges?: Edge[] };
     const nodes = flowData.nodes ?? [];
     const edges = flowData.edges ?? [];
     const overview = getProcessOverview({
-        name: project.name,
-        description: project.description,
+        name: process.name,
+        description: process.description,
         nodes,
         edges,
-        createdAt: project.createdAt.toISOString(),
-        updatedAt: project.updatedAt.toISOString(),
+        createdAt: process.createdAt.toISOString(),
+        updatedAt: process.updatedAt.toISOString(),
     });
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString("en-US", {
@@ -65,26 +65,15 @@ export function ProcessCard({
             <CardHeader>
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
-                        <CardTitle className="text-lg">{project.name}</CardTitle>
+                        <CardTitle className="text-lg">{process.name}</CardTitle>
                         <p className="text-muted-foreground mt-1 text-sm">
-                            {project.description ?? "No description provided"}
+                            {process.description ?? "No description provided"}
                         </p>
                     </div>
-                    <Badge
-                        variant={
-                            overview.complexity === "High"
-                                ? "destructive"
-                                : overview.complexity === "Medium"
-                                    ? "default"
-                                    : "secondary"
-                        }
-                    >
-                        {overview.complexity}
-                    </Badge>
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
-                {/* Project Overview */}
+                {/* process Overview */}
                 <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Nodes:</span>
@@ -112,7 +101,7 @@ export function ProcessCard({
                 </div>
                 {/* XYFlow Data Preview */}
                 <div className="space-y-2">
-                    <Label className="text-sm font-medium">Project Preview</Label>
+                    <Label className="text-sm font-medium">Process Preview</Label>
                     <div className="h-48 overflow-hidden rounded-md border">
                         <ReactFlow
                             className={theme === "dark" ? "dark" : ""}
@@ -157,26 +146,26 @@ export function ProcessCard({
                 <div className="text-muted-foreground space-y-2 text-xs">
                     <div className="flex items-center space-x-2">
                         <Calendar className="h-3 w-3" />
-                        <span>Created: {formatDate(project.createdAt.toISOString())}</span>
+                        <span>Created: {formatDate(process.createdAt.toISOString())}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <Calendar className="h-3 w-3" />
-                        <span>Updated: {formatDate(project.updatedAt.toISOString())}</span>
+                        <span>Updated: {formatDate(process.updatedAt.toISOString())}</span>
                     </div>
                 </div>
                 {/* Actions */}
                 {!isPreview && (
                     <div className="flex items-center space-x-2 pt-2">
                         <Link
-                            href={`/plan/process-designer?project=${encodeURIComponent(project.id)}`}
+                            href={`/plan/process-designer?process=${encodeURIComponent(process.id)}`}
                             onMouseEnter={() => {
                                 void queryClient.prefetchQuery(
-                                    trpc.process.getById.queryOptions({ id: project.id }),
+                                    trpc.process.getById.queryOptions({ id: process.id }),
                                 );
                             }}
                             onFocus={() => {
                                 void queryClient.prefetchQuery(
-                                    trpc.process.getById.queryOptions({ id: project.id }),
+                                    trpc.process.getById.queryOptions({ id: process.id }),
                                 );
                             }}
                         >
