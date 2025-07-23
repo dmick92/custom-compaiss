@@ -325,17 +325,18 @@ function App() {
 
                 {/* OKR Grid */}
                 {sortedOKRs.length > 0 ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="columns-1 lg:columns-2 gap-6 space-y-6">
                         {sortedOKRs.map((okr) => (
-                            <OKRCard
-                                key={okr.id}
-                                okr={okr}
-                                onEdit={handleEditOKR}
-                                onDelete={() => handleDeleteOKR(okr)}
-                                onToggleKeyResult={handleToggleKeyResult}
-                                onUpdateKeyResultProgress={handleUpdateKeyResultProgress}
-                                onEditKeyResult={handleEditKeyResult}
-                            />
+                            <div key={okr.id} className="mb-6 break-inside-avoid">
+                                <OKRCard
+                                    okr={okr}
+                                    onEdit={handleEditOKR}
+                                    onDelete={() => handleDeleteOKR(okr)}
+                                    onToggleKeyResult={handleToggleKeyResult}
+                                    onUpdateKeyResultProgress={handleUpdateKeyResultProgress}
+                                    onEditKeyResult={handleEditKeyResult}
+                                />
+                            </div>
                         ))}
                     </div>
                 ) : (
