@@ -232,47 +232,39 @@ function App() {
             {/* Stats */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <Card>
-                        <CardContent className="p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Total OKRs</p>
-                                    <p className="text-2xl font-bold text-foreground">{totalOKRs}</p>
+                    {[{
+                        title: 'Total OKRs',
+                        value: totalOKRs,
+                        icon: Target,
+                        color: 'primary',
+                        bgColor: 'primary/10',
+                    }, {
+                        title: 'Completed',
+                        value: completedOKRs,
+                        icon: Check,
+                        color: 'green-600',
+                        bgColor: 'green-500/10',
+                    }, {
+                        title: 'Avg Progress',
+                        value: `${Math.round(averageProgress)}%`,
+                        icon: BarChart3,
+                        color: 'orange-600',
+                        bgColor: 'orange-500/10',
+                    }].map((item, index) => (
+                        <Card key={index} className='py-0'>
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">{item.title}</p>
+                                        <p className="text-2xl font-bold text-foreground">{item.value}</p>
+                                    </div>
+                                    <div className={`w-12 h-12 bg-${item.bgColor} rounded-lg flex items-center justify-center`}>
+                                        <item.icon className={`w-6 h-6 text-${item.color}`} />
+                                    </div>
                                 </div>
-                                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                                    <Target className="w-6 h-6 text-primary" />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent className="p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                                    <p className="text-2xl font-bold text-foreground">{completedOKRs}</p>
-                                </div>
-                                <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
-                                    <BarChart3 className="w-6 h-6 text-green-600" />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent className="p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Avg Progress</p>
-                                    <p className="text-2xl font-bold text-foreground">{Math.round(averageProgress)}%</p>
-                                </div>
-                                <div className="w-12 h-12 bg-orange-500/10 rounded-lg flex items-center justify-center">
-                                    <BarChart3 className="w-6 h-6 text-orange-600" />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
+                    ))}
                 </div>
 
                 {/* Filters */}
