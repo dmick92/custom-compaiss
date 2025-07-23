@@ -16,6 +16,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '~/components/ui/dialog';
+import { priorities, PriorityBadge, PrioritySelectOptions } from '~/app/_components/priority';
 
 
 
@@ -37,12 +38,14 @@ export interface OKR {
     quarter: string;
     createdAt: Date;
     updatedAt: Date;
+    priority: (typeof priorities)[number];
 }
 
 export interface CreateOKRData {
     objective: string;
     keyResults: string[];
     quarter: string;
+    priority?: (typeof priorities)[number];
 }
 
 function App() {
@@ -73,6 +76,7 @@ function App() {
             quarter: 'Q1 2025',
             createdAt: new Date('2025-01-01'),
             updatedAt: new Date('2025-01-15'),
+            priority: 'High',
         },
         {
             id: '2',
@@ -94,6 +98,7 @@ function App() {
             quarter: 'Q1 2025',
             createdAt: new Date('2025-01-05'),
             updatedAt: new Date('2025-01-20'),
+            priority: 'Medium',
         },
     ]);
 
@@ -118,6 +123,7 @@ function App() {
             quarter: data.quarter,
             createdAt: new Date(),
             updatedAt: new Date(),
+            priority: data.priority || 'Medium',
         };
 
         setOkrs([newOKR, ...okrs]);
@@ -207,10 +213,17 @@ function App() {
         setEditingKeyResult(null);
     };
 
+    // Sort OKRs by enum order: Critical > High > Medium > Low > Lowest
+    const priorityOrder = priorities.reduce((acc, p, i) => { acc[p] = i; return acc; }, {} as Record<string, number>);
     const quarters = ['All', ...Array.from(new Set(okrs.map(okr => okr.quarter)))];
     const filteredOKRs = quarterFilter === 'All'
         ? okrs
         : okrs.filter(okr => okr.quarter === quarterFilter);
+    const sortedOKRs = [...filteredOKRs].sort((a, b) => {
+        const aOrder = priorityOrder[a.priority] ?? 0;
+        const bOrder = priorityOrder[b.priority] ?? 0;
+        return bOrder - aOrder;
+    });
 
     const totalOKRs = okrs.length;
     const completedOKRs = okrs.filter(okr =>
@@ -311,9 +324,9 @@ function App() {
                 </div>
 
                 {/* OKR Grid */}
-                {filteredOKRs.length > 0 ? (
+                {sortedOKRs.length > 0 ? (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {filteredOKRs.map((okr) => (
+                        {sortedOKRs.map((okr) => (
                             <OKRCard
                                 key={okr.id}
                                 okr={okr}
@@ -376,12 +389,15 @@ function App() {
                 onConfirm={confirmDeleteOKR}
                 objectiveName={deletingOKR?.objective || ''}
             />
-            <KeyResultEditModal
-                isOpen={!!editingKeyResult}
-                onClose={() => setEditingKeyResult(null)}
-                keyResult={editingKeyResult?.keyResult || null}
-                onSubmit={kr => handleUpdateKeyResult(editingKeyResult!.okrId, kr)}
-            />
+            {/* Only render KeyResultEditModal if editingKeyResult is defined */}
+            {editingKeyResult && (
+                <KeyResultEditModal
+                    isOpen={true}
+                    onClose={() => setEditingKeyResult(null)}
+                    keyResult={editingKeyResult.keyResult}
+                    onSubmit={kr => handleUpdateKeyResult(editingKeyResult.okrId, kr)}
+                />
+            )}
         </div>
     );
 }
@@ -412,6 +428,7 @@ const CreateOKRModal: React.FC<CreateOKRModalProps> = ({
     const [objective, setObjective] = useState('');
     const [keyResults, setKeyResults] = useState(['']);
     const [quarter, setQuarter] = useState('Q1 2025');
+    const [priority, setPriority] = useState<(typeof priorities)[number]>('Medium');
 
     const handleAddKeyResult = () => {
         setKeyResults([...keyResults, '']);
@@ -435,12 +452,14 @@ const CreateOKRModal: React.FC<CreateOKRModalProps> = ({
                 objective: objective.trim(),
                 keyResults: validKeyResults,
                 quarter,
+                priority,
             });
 
             // Reset form
             setObjective('');
             setKeyResults(['']);
             setQuarter('Q1 2025');
+            setPriority('Medium');
             onClose();
         }
     };
@@ -481,6 +500,18 @@ const CreateOKRModal: React.FC<CreateOKRModalProps> = ({
                             {quarters.map(q => (
                                 <SelectItem key={q} value={q}>{q}</SelectItem>
                             ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div>
+                    <Label className="mb-2">Priority</Label>
+                    <Select value={priority} onValueChange={v => setPriority(v as (typeof priorities)[number])}>
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <PrioritySelectOptions reverse />
                         </SelectContent>
                     </Select>
                 </div>
@@ -631,12 +662,13 @@ const EditOKRModal: React.FC<EditOKRModalProps> = ({
     const [objective, setObjective] = useState('');
     const [keyResults, setKeyResults] = useState<string[]>([]);
     const [quarter, setQuarter] = useState('Q1 2025');
-
+    const [priority, setPriority] = useState<(typeof priorities)[number]>('Medium');
     useEffect(() => {
         if (okr) {
             setObjective(okr.objective);
             setKeyResults(okr.keyResults.map(kr => kr.description));
             setQuarter(okr.quarter);
+            setPriority(okr.priority || 'Medium');
         }
     }, [okr]);
 
@@ -674,6 +706,7 @@ const EditOKRModal: React.FC<EditOKRModalProps> = ({
                 }),
                 quarter,
                 updatedAt: new Date(),
+                priority,
             };
 
             onSubmit(updatedOKR);
@@ -716,6 +749,18 @@ const EditOKRModal: React.FC<EditOKRModalProps> = ({
                             {quarters.map(q => (
                                 <SelectItem key={q} value={q}>{q}</SelectItem>
                             ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div>
+                    <Label className="mb-2">Priority</Label>
+                    <Select value={priority} onValueChange={v => setPriority(v as (typeof priorities)[number])}>
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <PrioritySelectOptions reverse />
                         </SelectContent>
                     </Select>
                 </div>
@@ -913,11 +958,13 @@ const OKRCard: React.FC<OKRCardProps> = ({
                             <h3 className="text-lg font-semibold text-foreground leading-tight mb-2">
                                 {okr.objective}
                             </h3>
-                            <div className="flex items-center text-sm text-muted-foreground mb-3">
-                                <Calendar className="w-4 h-4 mr-1" />
-                                <Badge variant="outline" className="mr-2">{okr.quarter}</Badge>
+                            <div className="flex items-center text-sm text-muted-foreground mb-3 space-x-2">
+                                <Calendar className="w-4 h-4" />
+                                <Badge variant="outline">{okr.quarter}</Badge>
                                 <span className="mx-2">•</span>
                                 <span>{completedKeyResults}/{okr.keyResults.length} Key Results</span>
+                                <span className="mx-2">•</span>
+                                <PriorityBadge priority={okr.priority} />
                             </div>
                         </div>
                     </div>
