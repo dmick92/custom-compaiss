@@ -1,0 +1,19 @@
+definition user {}
+
+definition document {
+    relation owner: user
+    relation editor: user
+    relation viewer: user
+
+    permission edit = owner + editor
+    permission view = owner + editor + viewer
+}
+
+definition folder {
+    relation owner: user
+    relation editor: user
+    relation parent: folder
+
+    permission edit = owner + editor + parent->edit
+    permission view = owner + editor + parent->view
+}
