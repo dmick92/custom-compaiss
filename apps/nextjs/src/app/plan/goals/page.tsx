@@ -25,6 +25,9 @@ export interface KeyResult {
     description: string;
     completed: boolean;
     progress: number; // 0-100
+    owner?: string;
+    dueDate?: string;
+    notes?: string;
 }
 
 export interface OKR {
@@ -100,6 +103,7 @@ function App() {
     const [editingOKR, setEditingOKR] = useState<OKR | null>(null);
     const [deletingOKR, setDeletingOKR] = useState<OKR | null>(null);
     const [quarterFilter, setQuarterFilter] = useState<string>('All');
+    const [editingKeyResult, setEditingKeyResult] = useState<{ okrId: string, keyResult: KeyResult } | null>(null);
 
     const handleCreateOKR = (data: CreateOKRData) => {
         const newOKR: OKR = {
@@ -183,6 +187,24 @@ function App() {
             }
             return okr;
         }));
+    };
+
+    // --- Ensure these are in scope for OKRCard and KeyResultItem ---
+    const handleEditKeyResult = (okrId: string, keyResult: KeyResult) => {
+        setEditingKeyResult({ okrId, keyResult });
+    };
+    const handleUpdateKeyResult = (okrId: string, updatedKeyResult: KeyResult) => {
+        setOkrs(okrs.map(okr => {
+            if (okr.id === okrId) {
+                return {
+                    ...okr,
+                    keyResults: okr.keyResults.map(kr => kr.id === updatedKeyResult.id ? updatedKeyResult : kr),
+                    updatedAt: new Date(),
+                };
+            }
+            return okr;
+        }));
+        setEditingKeyResult(null);
     };
 
     const quarters = ['All', ...Array.from(new Set(okrs.map(okr => okr.quarter)))];
@@ -299,6 +321,7 @@ function App() {
                                 onDelete={() => handleDeleteOKR(okr)}
                                 onToggleKeyResult={handleToggleKeyResult}
                                 onUpdateKeyResultProgress={handleUpdateKeyResultProgress}
+                                onEditKeyResult={handleEditKeyResult}
                             />
                         ))}
                     </div>
@@ -352,6 +375,12 @@ function App() {
                 }}
                 onConfirm={confirmDeleteOKR}
                 objectiveName={deletingOKR?.objective || ''}
+            />
+            <KeyResultEditModal
+                isOpen={!!editingKeyResult}
+                onClose={() => setEditingKeyResult(null)}
+                keyResult={editingKeyResult?.keyResult || null}
+                onSubmit={kr => handleUpdateKeyResult(editingKeyResult!.okrId, kr)}
             />
         </div>
     );
@@ -764,11 +793,13 @@ interface KeyResultItemProps {
     isEditable?: boolean;
 }
 
-const KeyResultItem: React.FC<KeyResultItemProps> = ({
+const KeyResultItem: React.FC<KeyResultItemProps & { okrId: string; onEdit: (okrId: string, keyResult: KeyResult) => void; }> = ({
     keyResult,
     onToggle,
     onProgressChange,
     isEditable = true,
+    okrId,
+    onEdit,
 }) => {
     return (
         <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent/50 transition-colors">
@@ -782,12 +813,14 @@ const KeyResultItem: React.FC<KeyResultItemProps> = ({
             >
                 {keyResult.completed ? <Check size={12} /> : <Circle size={12} className="opacity-0" />}
             </button>
-
             <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${keyResult.completed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                    {keyResult.description}
-                </p>
-
+                <div className="flex items-center justify-between">
+                    <p className={`text-sm font-medium ${keyResult.completed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{keyResult.description}</p>
+                    <Button variant="ghost" size="icon" onClick={() => onEdit(okrId, keyResult)}><Edit2 size={14} /></Button>
+                </div>
+                {keyResult.owner && <div className="text-xs text-muted-foreground">Owner: {keyResult.owner}</div>}
+                {keyResult.dueDate && <div className="text-xs text-muted-foreground">Due: {keyResult.dueDate}</div>}
+                {keyResult.notes && <div className="text-xs text-muted-foreground">Notes: {keyResult.notes}</div>}
                 {isEditable && !keyResult.completed && (
                     <div className="mt-2 flex items-center space-x-2">
                         <input
@@ -801,7 +834,6 @@ const KeyResultItem: React.FC<KeyResultItemProps> = ({
                         <span className="text-xs font-medium text-muted-foreground w-12">{keyResult.progress}%</span>
                     </div>
                 )}
-
                 {!isEditable && (
                     <div className="mt-1">
                         <Progress
@@ -853,6 +885,7 @@ interface OKRCardProps {
     onDelete: (id: string) => void;
     onToggleKeyResult: (okrId: string, keyResultId: string) => void;
     onUpdateKeyResultProgress: (okrId: string, keyResultId: string, progress: number) => void;
+    onEditKeyResult: (okrId: string, keyResult: KeyResult) => void;
 }
 
 const OKRCard: React.FC<OKRCardProps> = ({
@@ -861,6 +894,7 @@ const OKRCard: React.FC<OKRCardProps> = ({
     onDelete,
     onToggleKeyResult,
     onUpdateKeyResultProgress,
+    onEditKeyResult,
 }) => {
     const completedKeyResults = okr.keyResults.filter(kr => kr.completed).length;
     const totalProgress = okr.keyResults.length > 0
@@ -924,6 +958,8 @@ const OKRCard: React.FC<OKRCardProps> = ({
                             onProgressChange={(keyResultId, progress) =>
                                 onUpdateKeyResultProgress(okr.id, keyResultId, progress)
                             }
+                            okrId={okr.id}
+                            onEdit={onEditKeyResult}
                         />
                     ))}
                 </div>
@@ -948,5 +984,52 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress, className = '' }) =
             value={Math.min(progress, 100)}
             className={`h-2 ${className}`}
         />
+    );
+};
+
+const KeyResultEditModal: React.FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    keyResult: KeyResult | null;
+    onSubmit: (keyResult: KeyResult) => void;
+}> = ({ isOpen, onClose, keyResult, onSubmit }) => {
+    const [description, setDescription] = useState('');
+    const [owner, setOwner] = useState('');
+    const [dueDate, setDueDate] = useState('');
+    const [notes, setNotes] = useState('');
+    useEffect(() => {
+        if (keyResult) {
+            setDescription(keyResult.description || '');
+            setOwner(keyResult.owner || '');
+            setDueDate(keyResult.dueDate || '');
+            setNotes(keyResult.notes || '');
+        }
+    }, [keyResult]);
+    if (!keyResult) return null;
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Edit Key Result">
+            <form onSubmit={e => { e.preventDefault(); onSubmit({ ...keyResult, description, owner, dueDate, notes }); }} className="space-y-4">
+                <div>
+                    <Label>Description</Label>
+                    <Input value={description} onChange={e => setDescription(e.target.value)} required />
+                </div>
+                <div>
+                    <Label>Owner</Label>
+                    <Input value={owner} onChange={e => setOwner(e.target.value)} placeholder="Owner name" />
+                </div>
+                <div>
+                    <Label>Due Date</Label>
+                    <Input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+                </div>
+                <div>
+                    <Label>Notes</Label>
+                    <Textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} />
+                </div>
+                <div className="flex justify-end space-x-2 pt-2 border-t">
+                    <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+                    <Button type="submit">Save</Button>
+                </div>
+            </form>
+        </Modal>
     );
 };
