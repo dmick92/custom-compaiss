@@ -31,7 +31,7 @@ async function generatePermissionsSDK() {
     const generatedCode = generateSDK(augmentedAst!);
 
     // 5. Write to file
-    await fs.writeFile("src/generated/permissions.ts", generatedCode);
+    await fs.writeFile("src/permissions.ts", generatedCode);
     console.log("✅ Type-safe permissions SDK generated!");
 }
 

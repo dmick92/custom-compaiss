@@ -14,7 +14,8 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "generate:sdk": "node --loader ts-node/esm src/generate-permissions.ts"
+    "generate": "node --loader ts-node/esm script/generate-permissions.ts",
+    "test": "node --loader ts-node/esm src/index.ts"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
