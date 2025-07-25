@@ -14,6 +14,7 @@ import Header from "./_components/header";
 import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/sonner";
 import { ThemeProvider } from "./_components/theme-provider";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -62,15 +63,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           geistMono.variable,
         )}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>
-            <div className="grid h-svh grid-rows-[auto_1fr]">
-              <Header />
-              {props.children}
-            </div>
-          </TRPCReactProvider>
-          <Toaster />
-        </ThemeProvider>
+        <Providers>
+          {props.children}
+        </Providers>
       </body>
     </html>
   );
