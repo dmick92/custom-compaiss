@@ -1,19 +1,108 @@
 definition user {}
 
-definition document {
+definition organization {
     relation owner: user
+    relation admin: user
     relation editor: user
     relation viewer: user
 
-    permission edit = owner + editor
-    permission view = owner + editor + viewer
+    permission view = viewer + editor + admin + owner
+    permission edit = editor + admin + owner
+    permission admin_access = admin + owner
+    permission manage = owner
 }
 
-definition folder {
+definition team {
     relation owner: user
+    relation admin: user
     relation editor: user
-    relation parent: folder
+    relation viewer: user
+    relation member: user
+    relation organization: organization
 
-    permission edit = owner + editor + parent->edit
-    permission view = owner + editor + parent->view
+    permission view = viewer + editor + admin + owner
+    permission edit = editor + admin + owner
+    permission admin_access = admin + owner
+    permission manage = owner
+    permission member_access = member + editor + admin + owner
+}
+
+definition objective {
+    relation owner: user
+    relation admin: user
+    relation editor: user
+    relation viewer: user
+    relation organization: organization
+
+    permission view = viewer + editor + admin + owner
+    permission edit = editor + admin + owner
+    permission admin_access = admin + owner
+    permission manage = owner
+}
+
+definition key_result {
+    relation owner: user
+    relation admin: user
+    relation editor: user
+    relation viewer: user
+    relation objective: objective
+
+    permission view = viewer + editor + admin + owner
+    permission edit = editor + admin + owner
+    permission admin_access = admin + owner
+    permission manage = owner
+}
+
+definition strategy {
+    relation owner: user
+    relation admin: user
+    relation editor: user
+    relation viewer: user
+    relation organization: organization
+    relation key_result: key_result
+
+    permission view = viewer + editor + admin + owner
+    permission edit = editor + admin + owner
+    permission admin_access = admin + owner
+    permission manage = owner
+}
+
+definition process {
+    relation owner: user
+    relation admin: user
+    relation editor: user
+    relation viewer: user
+    relation organization: organization
+
+    permission view = viewer + editor + admin + owner
+    permission edit = editor + admin + owner
+    permission admin_access = admin + owner
+    permission manage = owner
+}
+
+definition project {
+    relation owner: user
+    relation admin: user
+    relation editor: user
+    relation viewer: user
+    relation organization: organization
+    relation team: team
+
+    permission view = viewer + editor + admin + owner
+    permission edit = editor + admin + owner
+    permission admin_access = admin + owner
+    permission manage = owner
+}
+
+definition task {
+    relation owner: user
+    relation admin: user
+    relation editor: user
+    relation viewer: user
+    relation project: project
+
+    permission view = viewer + editor + admin + owner
+    permission edit = editor + admin + owner
+    permission admin_access = admin + owner
+    permission manage = owner
 }
