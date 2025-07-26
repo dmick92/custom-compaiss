@@ -6,10 +6,10 @@ definition organization {
     relation editor: user
     relation viewer: user
 
-    permission view = viewer + editor + admin + owner
-    permission edit = editor + admin + owner
-    permission admin_access = admin + owner
-    permission manage = owner
+    permission create = admin + owner
+    permission read = viewer + editor + admin + owner
+    permission update = editor + admin + owner
+    permission delete = owner
 }
 
 definition team {
@@ -20,10 +20,10 @@ definition team {
     relation member: user
     relation organization: organization
 
-    permission view = viewer + editor + admin + owner
-    permission edit = editor + admin + owner
-    permission admin_access = admin + owner
-    permission manage = owner
+    permission create = admin + owner
+    permission read = viewer + editor + admin + owner
+    permission update = editor + admin + owner
+    permission delete = owner
     permission member_access = member + editor + admin + owner
 }
 
@@ -34,10 +34,10 @@ definition objective {
     relation viewer: user
     relation organization: organization
 
-    permission view = viewer + editor + admin + owner
-    permission edit = editor + admin + owner
-    permission admin_access = admin + owner
-    permission manage = owner
+    permission create = admin + owner
+    permission read = viewer + editor + admin + owner
+    permission update = editor + admin + owner
+    permission delete = owner
 }
 
 definition key_result {
@@ -47,10 +47,10 @@ definition key_result {
     relation viewer: user
     relation objective: objective
 
-    permission view = viewer + editor + admin + owner
-    permission edit = editor + admin + owner
-    permission admin_access = admin + owner
-    permission manage = owner
+    permission create = admin + owner
+    permission read = viewer + editor + admin + owner
+    permission update = editor + admin + owner
+    permission delete = owner
 }
 
 definition strategy {
@@ -61,10 +61,10 @@ definition strategy {
     relation organization: organization
     relation key_result: key_result
 
-    permission view = viewer + editor + admin + owner
-    permission edit = editor + admin + owner
-    permission admin_access = admin + owner
-    permission manage = owner
+    permission create = admin + owner
+    permission read = viewer + editor + admin + owner
+    permission update = editor + admin + owner
+    permission delete = owner
 }
 
 definition process {
@@ -74,10 +74,10 @@ definition process {
     relation viewer: user
     relation organization: organization
 
-    permission view = viewer + editor + admin + owner
-    permission edit = editor + admin + owner
-    permission admin_access = admin + owner
-    permission manage = owner
+    permission create = admin + owner
+    permission read = viewer + editor + admin + owner
+    permission update = editor + admin + owner
+    permission delete = owner
 }
 
 definition project {
@@ -88,10 +88,10 @@ definition project {
     relation organization: organization
     relation team: team
 
-    permission view = viewer + editor + admin + owner
-    permission edit = editor + admin + owner
-    permission admin_access = admin + owner
-    permission manage = owner
+    permission create = admin + owner
+    permission read = viewer + editor + admin + owner
+    permission update = editor + admin + owner
+    permission delete = owner
 }
 
 definition task {
@@ -101,8 +101,8 @@ definition task {
     relation viewer: user
     relation project: project
 
-    permission view = viewer + editor + admin + owner
-    permission edit = editor + admin + owner
-    permission admin_access = admin + owner
-    permission manage = owner
+    permission create = admin + owner
+    permission read = viewer + editor + admin + owner
+    permission update = editor + admin + owner
+    permission delete = owner
 }
