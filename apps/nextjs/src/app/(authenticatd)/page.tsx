@@ -91,11 +91,11 @@ export default function HomePage() {
       text: 'User management',
       done: false,
       children: [
-        { text: 'Create user profile overview section', done: false },
-        { text: 'Create user profile edit form', done: false },
+        { text: 'Create user profile overview section', done: true },
+        { text: 'Create user profile edit form', done: true },
         { text: 'Create user avatar upload section', done: false },
-        { text: 'Create user account settings section', done: false },
-        { text: 'Create user security settings section', done: false },
+        { text: 'Create user account settings section', done: true },
+        { text: 'Create user security settings section', done: true },
         { text: 'Create user notification preferences section', done: false },
         { text: 'Create user activity log section', done: false },
 
@@ -107,8 +107,8 @@ export default function HomePage() {
       done: false,
       children: [
         { text: 'List organizations user belongs to', done: false },
-        { text: 'Create new organization', done: false },
-        { text: 'Edit organization details', done: false },
+        { text: 'Create new organization', done: true },
+        { text: 'Edit organization details', done: true },
         { text: 'Delete organization', done: false },
         { text: 'Invite user to organization', done: false },
         { text: 'Remove user from organization', done: false },
@@ -135,7 +135,73 @@ export default function HomePage() {
       ],
     },
 
-    { text: 'Develop custom React hooks for SpiceDB integration', done: false },
+    { text: 'Develop custom React hooks for SpiceDB integration', done: true },
+
+    {
+      text: 'Add spicedb permissions', done: false,
+      children: [
+        {
+          text: 'Strategy', done: false,
+          children: [
+            { text: 'create', done: false },
+            { text: 'read', done: false },
+            { text: 'update', done: false },
+            { text: 'delete', done: false },
+            { text: 'assign users', done: false },
+          ],
+        },
+        {
+          text: 'Goal/OKR', done: false,
+          children: [
+            { text: 'create', done: false },
+            { text: 'read', done: false },
+            { text: 'update', done: false },
+            { text: 'delete', done: false },
+            { text: 'assign users', done: false },
+          ],
+        },
+        {
+          text: 'Project', done: false,
+          children: [
+            { text: 'create', done: false },
+            { text: 'read', done: false },
+            { text: 'update', done: false },
+            { text: 'delete', done: false },
+            { text: 'assign users', done: false },
+          ],
+        },
+        {
+          text: 'Team', done: false,
+          children: [
+            { text: 'create', done: false },
+            { text: 'read', done: false },
+            { text: 'update', done: false },
+            { text: 'delete', done: false },
+            { text: 'assign users', done: false },
+          ],
+        },
+        {
+          text: 'User', done: false,
+          children: [
+            { text: 'create', done: false },
+            { text: 'read', done: false },
+            { text: 'update', done: false },
+            { text: 'delete', done: false },
+            { text: 'assign users', done: false },
+          ],
+        },
+        {
+          text: 'Organization', done: false,
+          children: [
+            { text: 'create', done: false },
+            { text: 'read', done: false },
+            { text: 'update', done: false },
+            { text: 'delete', done: false },
+            { text: 'assign users', done: false },
+          ],
+        },
+      ],
+    },
   ];
 
   // Recursive list renderer
