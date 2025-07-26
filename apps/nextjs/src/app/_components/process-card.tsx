@@ -5,6 +5,7 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
+import { Skeleton } from "~/components/ui/skeleton";
 import type { Edge, Node } from "@xyflow/react";
 import { getProcessOverview } from "~/app/lib/process-utils";
 import type { RouterOutputs } from "@acme/api";
@@ -32,9 +33,11 @@ const nodeTypes = {
 export function ProcessCard({
     process,
     isPreview = false,
+    permissions
 }: {
     process: RouterOutputs["process"]["getAll"][number];
     isPreview?: boolean;
+    permissions?: { [key: string]: boolean };
 }) {
     const queryClient = useQueryClient();
     const trpc = useTRPC();
@@ -63,6 +66,7 @@ export function ProcessCard({
     return (
         <Card className="transition-shadow hover:shadow-lg">
             <CardHeader>
+                {JSON.stringify(permissions)}
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <CardTitle className="text-lg">{process.name}</CardTitle>
@@ -156,44 +160,109 @@ export function ProcessCard({
                 {/* Actions */}
                 {!isPreview && (
                     <div className="flex items-center space-x-2 pt-2">
-                        <Link
-                            href={`/plan/process-designer?process=${encodeURIComponent(process.id)}`}
-                            onMouseEnter={() => {
-                                void queryClient.prefetchQuery(
-                                    trpc.process.getById.queryOptions({ id: process.id }),
-                                );
-                            }}
-                            onFocus={() => {
-                                void queryClient.prefetchQuery(
-                                    trpc.process.getById.queryOptions({ id: process.id }),
-                                );
-                            }}
-                        >
-                            <Button className="flex-1" size="sm" variant="outline">
-                                <Edit className="mr-1 h-3 w-3" />
-                                Edit
+                        {permissions?.update && (
+                            <Link
+                                href={`/plan/process-designer?process=${encodeURIComponent(process.id)}`}
+                                onMouseEnter={() => {
+                                    void queryClient.prefetchQuery(
+                                        trpc.process.getById.queryOptions({ id: process.id }),
+                                    );
+                                }}
+                                onFocus={() => {
+                                    void queryClient.prefetchQuery(
+                                        trpc.process.getById.queryOptions({ id: process.id }),
+                                    );
+                                }}
+                            >
+                                <Button className="flex-1" size="sm" variant="outline">
+                                    <Edit className="mr-1 h-3 w-3" />
+                                    Edit
+                                </Button>
+                            </Link>
+                        )}
+                        {permissions?.read && (
+                            <Button size="sm" variant="outline">
+                                <Eye className="mr-1 h-3 w-3" />
+                                View
                             </Button>
-                        </Link>
-                        <Button size="sm" variant="outline">
-                            <Eye className="mr-1 h-3 w-3" />
-                            View
-                        </Button>
+                        )}
                         <Button size="sm" variant="outline">
                             <Share2 className="mr-1 h-3 w-3" />
                             Share
                         </Button>
-                        <Button
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => {
-                                alert("Delete functionality is not yet implemented via TRPC.");
-                            }}
-                            size="sm"
-                            variant="outline"
-                        >
-                            <Trash2 className="h-3 w-3" />
-                        </Button>
+                        {permissions?.delete && (
+                            <Button
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => {
+                                    alert("Delete functionality is not yet implemented via TRPC.");
+                                }}
+                                size="sm"
+                                variant="outline"
+                            >
+                                <Trash2 className="h-3 w-3" />
+                            </Button>
+                        )}
                     </div>
                 )}
+            </CardContent>
+        </Card>
+    );
+}
+
+export function ProcessCardSkeleton() {
+    return (
+        <Card className="transition-shadow hover:shadow-lg">
+            <CardHeader>
+                <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                        <Skeleton className="h-6 w-48 mb-2" />
+                        <Skeleton className="h-4 w-64" />
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {/* Process Overview Skeleton */}
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Nodes:</span>
+                        <Skeleton className="h-4 w-8" />
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Connections:</span>
+                        <Skeleton className="h-4 w-8" />
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Node Types:</span>
+                        <div className="flex gap-1">
+                            <Skeleton className="h-5 w-12" />
+                            <Skeleton className="h-5 w-12" />
+                            <Skeleton className="h-5 w-12" />
+                        </div>
+                    </div>
+                </div>
+                {/* Process Preview Skeleton */}
+                <div className="space-y-2">
+                    <Label className="text-sm font-medium">Process Preview</Label>
+                    <Skeleton className="h-48 w-full rounded-md" />
+                </div>
+                {/* Timestamps Skeleton */}
+                <div className="text-muted-foreground space-y-2 text-xs">
+                    <div className="flex items-center space-x-2">
+                        <Calendar className="h-3 w-3" />
+                        <Skeleton className="h-3 w-32" />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Calendar className="h-3 w-3" />
+                        <Skeleton className="h-3 w-32" />
+                    </div>
+                </div>
+                {/* Actions Skeleton */}
+                <div className="flex items-center space-x-2 pt-2">
+                    <Skeleton className="h-8 flex-1" />
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-8" />
+                </div>
             </CardContent>
         </Card>
     );

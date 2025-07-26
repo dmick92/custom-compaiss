@@ -2,7 +2,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod/v4";
 
 import { eq } from "@acme/db";
-import { Process, Project, Task } from "@acme/db/schema";
+import { Process, Project, CreateProjectSchema } from "@acme/db/schema";
 
 import { protectedProcedure } from "../trpc";
 
@@ -29,26 +29,12 @@ export const projectRouter = {
       };
     }),
   create: protectedProcedure
-    .input(z.object({
-      processId: z.string(),
-      name: z.string().optional(),
-      description: z.string().optional(),
-      priority: z.enum(["Lowest", "Low", "Medium", "High", "Critical"]).optional(),
-    }))
+    .input(CreateProjectSchema)
     .mutation(async ({ input, ctx }) => {
-      const process = await ctx.db.query.Process.findFirst({
-        where: eq(Process.id, input.processId),
-      });
-      if (!process) {
-        throw new Error("Process not found");
-      }
+      const parsed = CreateProjectSchema.parse(input);
       // Create the project
       const projectArr = await ctx.db.insert(Project).values({
-        name: input.name || process.name,
-        description: input.description || process.description,
-        flowData: process.flowData,
-        status: "ACTIVE",
-        priority: input.priority || "Medium",
+        ...parsed,
         createdAt: new Date(),
         updatedAt: new Date(),
       }).returning();
@@ -56,34 +42,7 @@ export const projectRouter = {
       if (!project) {
         throw new Error("Project creation failed");
       }
-      // Type guard for nodes
-      type NodeType = { type: string; data: any; position?: { x?: number; y?: number } };
-      let nodes: NodeType[] = [];
-      if (process.flowData && typeof process.flowData === 'object' && Array.isArray((process.flowData as any).nodes)) {
-        nodes = (process.flowData as { nodes: NodeType[] }).nodes;
-      }
-      const tasksToInsert: {
-        projectId: string;
-        type: string;
-        data: any;
-        positionX: number | null;
-        positionY: number | null;
-        createdAt: Date;
-        updatedAt: Date;
-      }[] = nodes.map((node) => ({
-        projectId: project.id,
-        type: node.type,
-        data: node.data,
-        positionX: node.position?.x ?? null,
-        positionY: node.position?.y ?? null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }));
-      let createdTasks: typeof tasksToInsert = [];
-      if (tasksToInsert.length > 0) {
-        createdTasks = await ctx.db.insert(Task).values(tasksToInsert).returning();
-      }
-      return { project, tasks: createdTasks };
+      return { project };
     }),
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
@@ -94,19 +53,18 @@ export const projectRouter = {
     .input(
       z.object({
         id: z.string().nullish(),
-        name: z.string(),
-        flowData: z.any(), // expects {nodes, edges, ...}
-      }),
+        data: CreateProjectSchema,
+      })
     )
     .mutation(async ({ input, ctx }) => {
       let res = null;
       if (input.id) {
         // Update existing project
+        const parsed = CreateProjectSchema.parse(input.data);
         const updated = await ctx.db
           .update(Project)
           .set({
-            name: input.name,
-            flowData: input.flowData,
+            ...parsed,
             updatedAt: new Date(),
           })
           .where(eq(Project.id, input.id))
@@ -114,11 +72,11 @@ export const projectRouter = {
         res = updated[0];
       } else {
         // Create new project
+        const parsed = CreateProjectSchema.parse(input.data);
         const created = await ctx.db
           .insert(Project)
           .values({
-            name: input.name,
-            flowData: input.flowData,
+            ...parsed,
             status: "DRAFT",
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -126,7 +84,6 @@ export const projectRouter = {
           .returning();
         res = created[0];
       }
-
       return res;
     }),
 } satisfies TRPCRouterRecord;

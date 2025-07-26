@@ -1,7 +1,8 @@
 import { sql } from "drizzle-orm";
 import { pgEnum, pgTable } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import { organization, user } from "./auth-schema";
 
 export const Post = pgTable("post", (t) => ({
   id: t.uuid().notNull().primaryKey().defaultRandom(),
@@ -16,11 +17,7 @@ export const Post = pgTable("post", (t) => ({
 export const CreatePostSchema = createInsertSchema(Post, {
   title: z.string().max(256),
   content: z.string().max(256),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+})
 
 export * from "./auth-schema";
 
@@ -36,6 +33,7 @@ export const Process = pgTable("process", (t) => ({
   description: t.text(),
   status: processStatusEnum("status").notNull(),
   flowData: t.json().notNull(),
+  orgId: t.text().notNull().references(() => organization.id, { onDelete: "cascade" }),
   createdAt: t
     .timestamp({ mode: "date", withTimezone: true })
     .defaultNow()
@@ -45,6 +43,8 @@ export const Process = pgTable("process", (t) => ({
     .notNull()
     .$onUpdateFn(() => sql`now()`),
 }));
+
+export const CreateProcessSchema = createInsertSchema(Process, { orgId: z.optional(z.never()) })
 
 export const projectPriorityEnum = pgEnum("ProjectPriority", [
   "Lowest",
@@ -61,6 +61,7 @@ export const Project = pgTable("project", (t) => ({
   status: processStatusEnum("status").notNull(),
   flowData: t.json().notNull(),
   priority: projectPriorityEnum("priority").notNull().default("Medium"),
+  orgId: t.text().notNull().references(() => organization.id, { onDelete: "cascade" }),
   createdAt: t
     .timestamp({ mode: "date", withTimezone: true })
     .defaultNow()
@@ -71,12 +72,16 @@ export const Project = pgTable("project", (t) => ({
     .$onUpdateFn(() => sql`now()`),
 }));
 
+export const CreateProjectSchema = createInsertSchema(Project)
+
 export const Task = pgTable("task", (t) => ({
   id: t.uuid().defaultRandom().primaryKey(),
   projectId: t
     .uuid()
     .notNull()
     .references(() => Project.id, { onDelete: "cascade" }),
+  orgId: t.text().notNull().references(() => organization.id, { onDelete: "cascade" }),
+  userId: t.text().notNull().references(() => user.id, { onDelete: "cascade" }),
   type: t.varchar({ length: 128 }).notNull(),
   data: t.json().notNull(),
   positionX: t.real(),
@@ -90,3 +95,5 @@ export const Task = pgTable("task", (t) => ({
     .notNull()
     .$onUpdateFn(() => sql`now()`),
 }));
+
+export const CreateTaskSchema = createInsertSchema(Task)

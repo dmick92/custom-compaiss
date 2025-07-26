@@ -44,6 +44,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useTRPC } from "~/trpc/react";
 import { useCallback, useEffect, useState } from "react";
+import { authClient } from "~/auth/client";
 
 // Industry standard node types
 const nodeTypes: NodeTypes = {
@@ -533,13 +534,31 @@ function FlowDesignerContent() {
     }),
   );
 
+  const createMutation = useMutation(
+    trpc.process.create.mutationOptions({
+      onSuccess: () => {
+        alert(`Flow "${flowName}" created successfully!`);
+      },
+      onError: (err: { message: string }) => {
+        alert(`Failed to create: ${err.message}`);
+      },
+    }),
+  );
+
   const handleSave = useCallback(() => {
+    if (!processId) {
+      createMutation.mutate({
+        name: flowName,
+        flowData: { nodes, edges },
+        status: "DRAFT",
+      });
+    }
     //if (processId) {
-    saveMutation.mutate({
-      id: processId,
-      name: flowName,
-      flowData: { nodes, edges },
-    });
+    // saveMutation.mutate({
+    //   id: processId,
+    //   name: flowName,
+    //   flowData: { nodes, edges },
+    // });
     // } else {
     //     // fallback: localStorage
     //     const flowData = {
@@ -551,7 +570,7 @@ function FlowDesignerContent() {
     //     localStorage.setItem("savedFlow", JSON.stringify(flowData));
     //     alert(`Flow "${flowName}" saved locally!`);
     // }
-  }, [processId, flowName, nodes, edges, saveMutation]);
+  }, [processId, flowName, nodes, edges, createMutation]);
 
 
   return (

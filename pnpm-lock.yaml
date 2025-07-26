@@ -359,6 +359,9 @@ importers:
       '@acme/auth':
         specifier: workspace:*
         version: link:../auth
+      '@acme/authz':
+        specifier: workspace:*
+        version: link:../authz
       '@acme/db':
         specifier: workspace:*
         version: link:../db
@@ -396,6 +399,9 @@ importers:
 
   packages/auth:
     dependencies:
+      '@acme/authz':
+        specifier: workspace:*
+        version: link:../authz
       '@acme/db':
         specifier: workspace:*
         version: link:../db
