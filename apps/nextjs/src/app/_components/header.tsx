@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpenIcon, InfoIcon, LifeBuoyIcon } from "lucide-react";
+import { BookOpenIcon, InfoIcon, LifeBuoyIcon, SettingsIcon } from "lucide-react";
 
 import Logo from "~/app/_components/logo";
 import { ModeToggle } from "~/app/_components/mode-toggle";
@@ -22,6 +22,7 @@ import {
 } from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
 import { env } from "~/env";
+import { UserAvatar, UserButton } from "@daveyplate/better-auth-ui";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -395,7 +396,21 @@ export default function Header() {
             </NavigationMenu>
           )}
           <ModeToggle />
-          <UserMenu />
+          <UserButton
+            size="icon"
+            localization={{
+              SETTINGS: "Account Settings",
+            }}
+            additionalLinks={[
+              {
+                href: "/organizations/settings",
+                label: "Organization Settings",
+                icon: <SettingsIcon />,
+                signedIn: true,
+                separator: true,
+              }
+            ]}
+          />
         </div>
       </div>
     </header>
