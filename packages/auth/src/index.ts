@@ -5,6 +5,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { oAuthProxy, organization } from "better-auth/plugins";
 
 import { db } from "@acme/db/client";
+import { permissions, spicedbClient } from "@acme/authz";
 
 export function initAuth(options: {
   baseUrl: string;
@@ -33,6 +34,14 @@ export function initAuth(options: {
         teams: {
           enabled: true,
         },
+        organizationCreation: {
+          afterCreate: async ({ organization, member }) => {
+            await permissions.organization.grant.owner(
+              `user:${member.userId}`,
+              `organization:${organization.id}`
+            ).execute(spicedbClient);
+          }
+        }
       }),
     ],
     socialProviders: {

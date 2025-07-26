@@ -25,6 +25,10 @@ export function Providers({ children }: { children: ReactNode }) {
                         router.refresh()
                     }}
                     Link={Link}
+                    organization={{}}
+                    settings={{
+                        url: "/settings",
+                    }}
                 >
                     {children}
                 </AuthUIProvider>
