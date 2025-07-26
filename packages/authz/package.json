@@ -15,7 +15,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "generate": "node --loader ts-node/esm script/generate-permissions.ts",
-    "test": "node --loader ts-node/esm src/index.ts"
+    "test": "node --loader ts-node/esm script/test.ts",
+    "load": "node --loader ts-node/esm script/loadSchema.ts"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",

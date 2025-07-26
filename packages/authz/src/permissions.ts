@@ -34,10 +34,10 @@ export const permissions = {
       viewer: (subject: Subject<'user'>, resource: OrganizationResource) => PermissionOperations.revoke('viewer').subject(subject).resource(resource),
     },
     check: {
-      view: (subject: Subject<'user'>, resource: OrganizationResource) => PermissionOperations.check('view').subject(subject).resource(resource),
-      edit: (subject: Subject<'user'>, resource: OrganizationResource) => PermissionOperations.check('edit').subject(subject).resource(resource),
-      adminAccess: (subject: Subject<'user'>, resource: OrganizationResource) => PermissionOperations.check('admin_access').subject(subject).resource(resource),
-      manage: (subject: Subject<'user'>, resource: OrganizationResource) => PermissionOperations.check('manage').subject(subject).resource(resource),
+      create: (subject: Subject<'user'>, resource: OrganizationResource) => PermissionOperations.check('create').subject(subject).resource(resource),
+      read: (subject: Subject<'user'>, resource: OrganizationResource) => PermissionOperations.check('read').subject(subject).resource(resource),
+      update: (subject: Subject<'user'>, resource: OrganizationResource) => PermissionOperations.check('update').subject(subject).resource(resource),
+      delete: (subject: Subject<'user'>, resource: OrganizationResource) => PermissionOperations.check('delete').subject(subject).resource(resource),
     },
     find: {
       byOwner: (subject: Subject<'user'>) => PermissionOperations.find().relation('owner').subject(subject),
@@ -64,10 +64,10 @@ export const permissions = {
       organization: (subject: Subject<'organization'>, resource: TeamResource) => PermissionOperations.revoke('organization').subject(subject).resource(resource),
     },
     check: {
-      view: (subject: Subject<'user'>, resource: TeamResource) => PermissionOperations.check('view').subject(subject).resource(resource),
-      edit: (subject: Subject<'user'>, resource: TeamResource) => PermissionOperations.check('edit').subject(subject).resource(resource),
-      adminAccess: (subject: Subject<'user'>, resource: TeamResource) => PermissionOperations.check('admin_access').subject(subject).resource(resource),
-      manage: (subject: Subject<'user'>, resource: TeamResource) => PermissionOperations.check('manage').subject(subject).resource(resource),
+      create: (subject: Subject<'user'>, resource: TeamResource) => PermissionOperations.check('create').subject(subject).resource(resource),
+      read: (subject: Subject<'user'>, resource: TeamResource) => PermissionOperations.check('read').subject(subject).resource(resource),
+      update: (subject: Subject<'user'>, resource: TeamResource) => PermissionOperations.check('update').subject(subject).resource(resource),
+      delete: (subject: Subject<'user'>, resource: TeamResource) => PermissionOperations.check('delete').subject(subject).resource(resource),
       memberAccess: (subject: Subject<'user'>, resource: TeamResource) => PermissionOperations.check('member_access').subject(subject).resource(resource),
     },
     find: {
@@ -95,10 +95,10 @@ export const permissions = {
       organization: (subject: Subject<'organization'>, resource: ObjectiveResource) => PermissionOperations.revoke('organization').subject(subject).resource(resource),
     },
     check: {
-      view: (subject: Subject<'user'>, resource: ObjectiveResource) => PermissionOperations.check('view').subject(subject).resource(resource),
-      edit: (subject: Subject<'user'>, resource: ObjectiveResource) => PermissionOperations.check('edit').subject(subject).resource(resource),
-      adminAccess: (subject: Subject<'user'>, resource: ObjectiveResource) => PermissionOperations.check('admin_access').subject(subject).resource(resource),
-      manage: (subject: Subject<'user'>, resource: ObjectiveResource) => PermissionOperations.check('manage').subject(subject).resource(resource),
+      create: (subject: Subject<'user'>, resource: ObjectiveResource) => PermissionOperations.check('create').subject(subject).resource(resource),
+      read: (subject: Subject<'user'>, resource: ObjectiveResource) => PermissionOperations.check('read').subject(subject).resource(resource),
+      update: (subject: Subject<'user'>, resource: ObjectiveResource) => PermissionOperations.check('update').subject(subject).resource(resource),
+      delete: (subject: Subject<'user'>, resource: ObjectiveResource) => PermissionOperations.check('delete').subject(subject).resource(resource),
     },
     find: {
       byOwner: (subject: Subject<'user'>) => PermissionOperations.find().relation('owner').subject(subject),
@@ -124,10 +124,10 @@ export const permissions = {
       objective: (subject: Subject<'objective'>, resource: KeyResultResource) => PermissionOperations.revoke('objective').subject(subject).resource(resource),
     },
     check: {
-      view: (subject: Subject<'user'>, resource: KeyResultResource) => PermissionOperations.check('view').subject(subject).resource(resource),
-      edit: (subject: Subject<'user'>, resource: KeyResultResource) => PermissionOperations.check('edit').subject(subject).resource(resource),
-      adminAccess: (subject: Subject<'user'>, resource: KeyResultResource) => PermissionOperations.check('admin_access').subject(subject).resource(resource),
-      manage: (subject: Subject<'user'>, resource: KeyResultResource) => PermissionOperations.check('manage').subject(subject).resource(resource),
+      create: (subject: Subject<'user'>, resource: KeyResultResource) => PermissionOperations.check('create').subject(subject).resource(resource),
+      read: (subject: Subject<'user'>, resource: KeyResultResource) => PermissionOperations.check('read').subject(subject).resource(resource),
+      update: (subject: Subject<'user'>, resource: KeyResultResource) => PermissionOperations.check('update').subject(subject).resource(resource),
+      delete: (subject: Subject<'user'>, resource: KeyResultResource) => PermissionOperations.check('delete').subject(subject).resource(resource),
     },
     find: {
       byOwner: (subject: Subject<'user'>) => PermissionOperations.find().relation('owner').subject(subject),
@@ -155,10 +155,10 @@ export const permissions = {
       keyResult: (subject: Subject<'key_result'>, resource: StrategyResource) => PermissionOperations.revoke('key_result').subject(subject).resource(resource),
     },
     check: {
-      view: (subject: Subject<'user'>, resource: StrategyResource) => PermissionOperations.check('view').subject(subject).resource(resource),
-      edit: (subject: Subject<'user'>, resource: StrategyResource) => PermissionOperations.check('edit').subject(subject).resource(resource),
-      adminAccess: (subject: Subject<'user'>, resource: StrategyResource) => PermissionOperations.check('admin_access').subject(subject).resource(resource),
-      manage: (subject: Subject<'user'>, resource: StrategyResource) => PermissionOperations.check('manage').subject(subject).resource(resource),
+      create: (subject: Subject<'user'>, resource: StrategyResource) => PermissionOperations.check('create').subject(subject).resource(resource),
+      read: (subject: Subject<'user'>, resource: StrategyResource) => PermissionOperations.check('read').subject(subject).resource(resource),
+      update: (subject: Subject<'user'>, resource: StrategyResource) => PermissionOperations.check('update').subject(subject).resource(resource),
+      delete: (subject: Subject<'user'>, resource: StrategyResource) => PermissionOperations.check('delete').subject(subject).resource(resource),
     },
     find: {
       byOwner: (subject: Subject<'user'>) => PermissionOperations.find().relation('owner').subject(subject),
@@ -185,10 +185,10 @@ export const permissions = {
       organization: (subject: Subject<'organization'>, resource: ProcessResource) => PermissionOperations.revoke('organization').subject(subject).resource(resource),
     },
     check: {
-      view: (subject: Subject<'user'>, resource: ProcessResource) => PermissionOperations.check('view').subject(subject).resource(resource),
-      edit: (subject: Subject<'user'>, resource: ProcessResource) => PermissionOperations.check('edit').subject(subject).resource(resource),
-      adminAccess: (subject: Subject<'user'>, resource: ProcessResource) => PermissionOperations.check('admin_access').subject(subject).resource(resource),
-      manage: (subject: Subject<'user'>, resource: ProcessResource) => PermissionOperations.check('manage').subject(subject).resource(resource),
+      create: (subject: Subject<'user'>, resource: ProcessResource) => PermissionOperations.check('create').subject(subject).resource(resource),
+      read: (subject: Subject<'user'>, resource: ProcessResource) => PermissionOperations.check('read').subject(subject).resource(resource),
+      update: (subject: Subject<'user'>, resource: ProcessResource) => PermissionOperations.check('update').subject(subject).resource(resource),
+      delete: (subject: Subject<'user'>, resource: ProcessResource) => PermissionOperations.check('delete').subject(subject).resource(resource),
     },
     find: {
       byOwner: (subject: Subject<'user'>) => PermissionOperations.find().relation('owner').subject(subject),
@@ -216,10 +216,10 @@ export const permissions = {
       team: (subject: Subject<'team'>, resource: ProjectResource) => PermissionOperations.revoke('team').subject(subject).resource(resource),
     },
     check: {
-      view: (subject: Subject<'user'>, resource: ProjectResource) => PermissionOperations.check('view').subject(subject).resource(resource),
-      edit: (subject: Subject<'user'>, resource: ProjectResource) => PermissionOperations.check('edit').subject(subject).resource(resource),
-      adminAccess: (subject: Subject<'user'>, resource: ProjectResource) => PermissionOperations.check('admin_access').subject(subject).resource(resource),
-      manage: (subject: Subject<'user'>, resource: ProjectResource) => PermissionOperations.check('manage').subject(subject).resource(resource),
+      create: (subject: Subject<'user'>, resource: ProjectResource) => PermissionOperations.check('create').subject(subject).resource(resource),
+      read: (subject: Subject<'user'>, resource: ProjectResource) => PermissionOperations.check('read').subject(subject).resource(resource),
+      update: (subject: Subject<'user'>, resource: ProjectResource) => PermissionOperations.check('update').subject(subject).resource(resource),
+      delete: (subject: Subject<'user'>, resource: ProjectResource) => PermissionOperations.check('delete').subject(subject).resource(resource),
     },
     find: {
       byOwner: (subject: Subject<'user'>) => PermissionOperations.find().relation('owner').subject(subject),
@@ -246,10 +246,10 @@ export const permissions = {
       project: (subject: Subject<'project'>, resource: TaskResource) => PermissionOperations.revoke('project').subject(subject).resource(resource),
     },
     check: {
-      view: (subject: Subject<'user'>, resource: TaskResource) => PermissionOperations.check('view').subject(subject).resource(resource),
-      edit: (subject: Subject<'user'>, resource: TaskResource) => PermissionOperations.check('edit').subject(subject).resource(resource),
-      adminAccess: (subject: Subject<'user'>, resource: TaskResource) => PermissionOperations.check('admin_access').subject(subject).resource(resource),
-      manage: (subject: Subject<'user'>, resource: TaskResource) => PermissionOperations.check('manage').subject(subject).resource(resource),
+      create: (subject: Subject<'user'>, resource: TaskResource) => PermissionOperations.check('create').subject(subject).resource(resource),
+      read: (subject: Subject<'user'>, resource: TaskResource) => PermissionOperations.check('read').subject(subject).resource(resource),
+      update: (subject: Subject<'user'>, resource: TaskResource) => PermissionOperations.check('update').subject(subject).resource(resource),
+      delete: (subject: Subject<'user'>, resource: TaskResource) => PermissionOperations.check('delete').subject(subject).resource(resource),
     },
     find: {
       byOwner: (subject: Subject<'user'>) => PermissionOperations.find().relation('owner').subject(subject),
