@@ -1,7 +1,7 @@
 "use client";
 
 import type { Edge, Node } from "@xyflow/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { Background, ReactFlow } from "@xyflow/react";
 import {
@@ -40,7 +40,10 @@ import {
   StartNode,
 } from "~/app/_components/flow-designer/nodes";
 import { useTRPC } from "~/trpc/react";
-import { ProcessCard } from "~/app/_components/process-card";
+import { ProcessCard, ProcessCardSkeleton } from "~/app/_components/process-card";
+import { useBatchPermissions } from "~/hooks/usePermission";
+import { authClient } from "~/auth/client";
+import { createSolutionBuilderWithWatch } from "typescript";
 
 type Process = RouterOutputs["process"]["getAll"][number];
 
@@ -229,9 +232,7 @@ const createMockProcesses = () => {
 
 export default function ProcessesPage() {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
 
-  const { theme } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   // Fetch processes from backend
   const {
@@ -250,16 +251,24 @@ export default function ProcessesPage() {
     setFilteredProcesses(filtered ?? []);
   }, [processes, searchTerm]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  const { data: session } = authClient.useSession();
+  const userId = session?.user.id;
 
+  // Memoize the permissions array to prevent unnecessary re-renders
+  const permissionKeys = useMemo(() =>
+    processes?.map((item) => `process:${item.id}`) ?? [],
+    [processes]
+  );
+
+  // Memoize userId to prevent unnecessary re-renders
+  const memoizedUserId = useMemo(() => userId ?? "", [userId]);
+
+  // Only call useBatchPermissions when we have a valid userId and processes
+  const { data: permissionMap, isLoading: isLoadingPermissions } = useBatchPermissions(
+    memoizedUserId,
+    permissionKeys
+  );
+  console.log("test")
   return (
     <div className="container mx-auto space-y-6 p-6">
       {/* Header */}
@@ -355,9 +364,16 @@ export default function ProcessesPage() {
             )}
           </div>
         </Card>
+      ) : isLoadingPermissions ? (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredProcesses.map((process: Process) => {
+            return <ProcessCardSkeleton key={process.id} />;
+          })}
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredProcesses.map((process: Process, index: number) => {
+            const perms = permissionMap?.[`process:${process.id}`];
             // Use flowData for nodes/edges preview if available
             const flowData = process.flowData as {
               nodes?: Node[];
@@ -378,6 +394,7 @@ export default function ProcessesPage() {
               <ProcessCard
                 key={process.id}
                 process={process}
+                permissions={perms}
               />
             );
           })}

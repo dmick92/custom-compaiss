@@ -1,10 +1,11 @@
-import type { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod/v4";
 
 import { eq } from "@acme/db";
-import { Process } from "@acme/db/schema";
+import { Process, CreateProcessSchema } from "@acme/db/schema";
 
-import { protectedProcedure } from "../trpc";
+import { protectedProcedure, requirePermission } from "../trpc";
+import { permissions, spicedbClient } from "@acme/authz";
 
 export const processRouter = {
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -13,7 +14,13 @@ export const processRouter = {
   }),
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))
+    .use(requirePermission({
+      resourceType: "process",
+      action: "view",
+      getResourceId: ({ input }) => (input as { id?: string }).id ?? "",
+    }))
     .query(async ({ input, ctx }) => {
+      console.log("getById", input.id);
       const process = await ctx.db.query.Process.findFirst({
         where: eq(Process.id, input.id),
       });
@@ -28,25 +35,44 @@ export const processRouter = {
         updatedAt: process.updatedAt,
       };
     }),
+  create: protectedProcedure
+    .input(CreateProcessSchema)
+    .mutation(async ({ input, ctx }) => {
+      const orgId = ctx.session?.session.activeOrganizationId;
+      if (!orgId) throw new TRPCError({ code: "BAD_REQUEST", message: "No active organization" });
+
+      const created = await ctx.db
+        .insert(Process)
+        .values({ ...input, orgId })
+        .returning();
+      const res = created[0];
+      // Grant owner in spicedb
+      if (res && ctx.session?.user?.id) {
+        await permissions.process.grant.owner(
+          `user:${ctx.session.user.id}`,
+          `process:${res.id}`
+        ).execute(spicedbClient);
+      }
+      return res;
+    }),
+
+
+
+
   save: protectedProcedure
-    .input(
-      z.object({
-        id: z.string().nullish(),
-        name: z.string(),
-        flowData: z.any(), // expects {nodes, edges, ...}
-      }),
-    )
+    .input(CreateProcessSchema)
+    .use(requirePermission({
+      resourceType: "process",
+      action: "edit",
+      getResourceId: ({ input }) => (input as { id?: string }).id ?? "",
+    }))
     .mutation(async ({ input, ctx }) => {
       let res = null;
       if (input.id) {
         // Update existing process
         const updated = await ctx.db
           .update(Process)
-          .set({
-            name: input.name,
-            flowData: input.flowData,
-            updatedAt: new Date(),
-          })
+          .set(input)
           .where(eq(Process.id, input.id))
           .returning();
         res = updated[0];
@@ -54,17 +80,18 @@ export const processRouter = {
         // Create new process
         const created = await ctx.db
           .insert(Process)
-          .values({
-            name: input.name,
-            flowData: input.flowData,
-            status: "DRAFT",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          })
+          .values(input)
           .returning();
         res = created[0];
-      }
 
+        // Grant owner in spicedb
+        if (res && ctx.session?.user?.id) {
+          await permissions.process.grant.owner(
+            `user:${ctx.session.user.id}`,
+            `process:${res.id}`
+          ).execute(spicedbClient);
+        }
+      }
       return res;
     }),
 } satisfies TRPCRouterRecord;

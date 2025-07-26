@@ -12,6 +12,7 @@ import { z, ZodError } from "zod/v4";
 
 import type { Auth } from "@acme/auth";
 import { db } from "@acme/db/client";
+import { permissions, spicedbClient } from "@acme/authz";
 
 /**
  * 1. CONTEXT
@@ -126,3 +127,41 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+/**
+ * Permission middleware for tRPC
+ * @param resourceType - e.g. 'process', 'project', 'task'
+ * @param action - e.g. 'view', 'edit', 'manage'
+ * @param getResourceId - function to extract resource id from input/context
+ */
+export function requirePermission<
+  ResourceType extends keyof typeof permissions,
+  Action extends keyof (typeof permissions[ResourceType]["check"])
+>({
+  resourceType,
+  action,
+  getResourceId,
+}: {
+  resourceType: ResourceType;
+  action: Action;
+  getResourceId: (opts: { input: unknown; ctx: any }) => string;
+}) {
+  return t.middleware(async (opts) => {
+    const { ctx, input, next } = opts;
+    const userId = ctx.session?.user?.id;
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    const resourceId = getResourceId({ input, ctx });
+    const checkFns = permissions[resourceType].check as Record<string, (subject: string, resource: string) => { execute: (client: any) => Promise<boolean> }>;
+    const checkFn = checkFns[action as string];
+    if (!checkFn) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Permission check not implemented for ${String(resourceType)}.${String(action)}` });
+    }
+    const allowed = await checkFn(`user:${userId}`, `${resourceType}:${resourceId}`).execute(spicedbClient);
+    if (!allowed) {
+      throw new TRPCError({ code: "FORBIDDEN" });
+    }
+    return next();
+  });
+}
