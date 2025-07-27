@@ -100,181 +100,179 @@ export default function StrategyDetailClient({ strategy, initialDocuments, strat
     };
 
     return (
-        <div className="min-h-screen bg-background">
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Link href="/plan/strategies">
-                            <Button variant="ghost" size="sm">
-                                <ArrowLeft className="mr-2 h-4 w-4" />
-                                Back to Strategies
-                            </Button>
-                        </Link>
-                    </div>
+        <div className="container mx-auto space-y-6 p-6">
+            {/* Header */}
+            <div className="mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                    <Link href="/plan/strategies">
+                        <Button variant="ghost" size="sm">
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Back to Strategies
+                        </Button>
+                    </Link>
+                </div>
 
-                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-                        <div className="flex-1">
-                            <h1 className="text-3xl font-bold mb-2">{strategy.title}</h1>
-                            <p className="text-muted-foreground text-lg mb-4">{strategy.description}</p>
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                    <div className="flex-1">
+                        <h1 className="text-3xl font-bold mb-2">{strategy.title}</h1>
+                        <p className="text-muted-foreground text-lg mb-4">{strategy.description}</p>
 
-                            <div className="flex flex-wrap items-center gap-4 mb-6">
-                                <div className="flex items-center gap-2">
-                                    <Badge className={statusColors[strategy.status]}>
-                                        {strategy.status}
-                                    </Badge>
-                                    <Badge variant="outline" className={priorityColors[strategy.priority]}>
-                                        {strategy.priority} priority
-                                    </Badge>
-                                </div>
-
-                                <Separator orientation="vertical" className="h-6" />
-
-                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                    <User className="h-4 w-4" />
-                                    <span>{strategy.owner}</span>
-                                </div>
-
-                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                    <Calendar className="h-4 w-4" />
-                                    <span>Updated {formatDistanceToNow(strategy.updatedAt, { addSuffix: true })}</span>
-                                </div>
+                        <div className="flex flex-wrap items-center gap-4 mb-6">
+                            <div className="flex items-center gap-2">
+                                <Badge className={statusColors[strategy.status]}>
+                                    {strategy.status}
+                                </Badge>
+                                <Badge variant="outline" className={priorityColors[strategy.priority]}>
+                                    {strategy.priority} priority
+                                </Badge>
                             </div>
 
-                            {strategy.tags.length > 0 && (
-                                <div className="flex items-center gap-2 mb-6">
-                                    <Tag className="h-4 w-4 text-muted-foreground" />
-                                    <div className="flex flex-wrap gap-2">
-                                        {strategy.tags.map((tag) => (
-                                            <Badge key={tag} variant="secondary">
-                                                {tag}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                            <Separator orientation="vertical" className="h-6" />
+
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <User className="h-4 w-4" />
+                                <span>{strategy.owner}</span>
+                            </div>
+
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Calendar className="h-4 w-4" />
+                                <span>Updated {formatDistanceToNow(strategy.updatedAt, { addSuffix: true })}</span>
+                            </div>
                         </div>
+
+                        {strategy.tags.length > 0 && (
+                            <div className="flex items-center gap-2 mb-6">
+                                <Tag className="h-4 w-4 text-muted-foreground" />
+                                <div className="flex flex-wrap gap-2">
+                                    {strategy.tags.map((tag) => (
+                                        <Badge key={tag} variant="secondary">
+                                            {tag}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                {/* Document Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Documents</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{documentStats.total}</div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                                <FileText className="h-4 w-4" />
-                                Word Docs
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{documentStats.word}</div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                                <Table className="h-4 w-4" />
-                                Spreadsheets
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{documentStats.spreadsheet}</div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                                <Brain className="h-4 w-4" />
-                                Mind Maps
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{documentStats.mindmap}</div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Documents Section */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-2xl font-semibold">Documents</h2>
-                            <p className="text-muted-foreground">Manage documents for this strategy</p>
-                        </div>
-                        <Button onClick={handleCreateDocument}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            New Document
-                        </Button>
-                    </div>
-
-                    {documents.length === 0 ? (
-                        <Card>
-                            <CardContent className="text-center py-12">
-                                <div className="text-muted-foreground mb-4">
-                                    <FileText className="h-12 w-12 mx-auto" />
-                                </div>
-                                <h3 className="text-lg font-medium mb-2">No documents yet</h3>
-                                <p className="text-muted-foreground mb-4">
-                                    Get started by creating your first document for this strategy
-                                </p>
-                                <Button onClick={handleCreateDocument}>
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Create Document
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {documents.map((document) => (
-                                <DocumentCard
-                                    key={document.id}
-                                    document={document}
-                                    onEdit={handleEditDocument}
-                                    onDelete={handleDeleteDocument}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* Document Form Dialog */}
-                <DocumentForm
-                    document={editingDocument}
-                    strategyId={strategyId}
-                    open={isDocumentFormOpen}
-                    onOpenChange={setIsDocumentFormOpen}
-                    onSave={handleSaveDocument}
-                />
-
-                {/* Delete Confirmation Dialog */}
-                <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the document.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={confirmDeleteDocument} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-                                Delete
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
             </div>
+
+            {/* Document Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Documents</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{documentStats.total}</div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                            <FileText className="h-4 w-4" />
+                            Word Docs
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{documentStats.word}</div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                            <Table className="h-4 w-4" />
+                            Spreadsheets
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{documentStats.spreadsheet}</div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                            <Brain className="h-4 w-4" />
+                            Mind Maps
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{documentStats.mindmap}</div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Documents Section */}
+            <div className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 className="text-2xl font-semibold">Documents</h2>
+                        <p className="text-muted-foreground">Manage documents for this strategy</p>
+                    </div>
+                    <Button onClick={handleCreateDocument}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        New Document
+                    </Button>
+                </div>
+
+                {documents.length === 0 ? (
+                    <Card>
+                        <CardContent className="text-center py-12">
+                            <div className="text-muted-foreground mb-4">
+                                <FileText className="h-12 w-12 mx-auto" />
+                            </div>
+                            <h3 className="text-lg font-medium mb-2">No documents yet</h3>
+                            <p className="text-muted-foreground mb-4">
+                                Get started by creating your first document for this strategy
+                            </p>
+                            <Button onClick={handleCreateDocument}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Document
+                            </Button>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {documents.map((document) => (
+                            <DocumentCard
+                                key={document.id}
+                                document={document}
+                                onEdit={handleEditDocument}
+                                onDelete={handleDeleteDocument}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Document Form Dialog */}
+            <DocumentForm
+                document={editingDocument}
+                strategyId={strategyId}
+                open={isDocumentFormOpen}
+                onOpenChange={setIsDocumentFormOpen}
+                onSave={handleSaveDocument}
+            />
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the document.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDeleteDocument} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
