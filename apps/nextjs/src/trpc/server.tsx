@@ -32,6 +32,24 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
   queryClient: getQueryClient,
 });
 
+/**
+ * Simple helper to create a tRPC caller for server-side data fetching
+ * @example
+ * const caller = await createCaller()
+ * const tasks = await caller.task.list()
+ */
+export async function createCaller() {
+  const heads = await headers();
+  //heads.set("x-trpc-source", "rsc");
+
+  const ctx = await createTRPCContext({
+    headers: heads,
+    auth,
+  });
+
+  return appRouter.createCaller(ctx);
+}
+
 export function HydrateClient(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
   return (
