@@ -25,10 +25,10 @@ export default async function StrategyDetailPage({ params }: StrategyDetailPageP
 
     if (!strategy) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="text-center">
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">Strategy not found</h2>
-                    <p className="text-gray-600 mb-4">The strategy you're looking for doesn't exist.</p>
+                    <h2 className="text-2xl font-semibold mb-2">Strategy not found</h2>
+                    <p className="text-muted-foreground mb-4">The strategy you're looking for doesn't exist.</p>
                     <Link href="/strategies">
                         <Button>
                             <ArrowLeft className="mr-2 h-4 w-4" />
