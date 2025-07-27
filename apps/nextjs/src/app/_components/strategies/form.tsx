@@ -81,7 +81,7 @@ export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyF
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
                             <Label htmlFor="title">Title</Label>
@@ -112,7 +112,7 @@ export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyF
                                 value={formData.status}
                                 onValueChange={(value: StrategyStatus) => setFormData(prev => ({ ...prev, status: value }))}
                             >
-                                <SelectTrigger>
+                                <SelectTrigger className="mt-1 w-full">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -130,7 +130,7 @@ export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyF
                                 value={formData.priority}
                                 onValueChange={(value: StrategyPriority) => setFormData(prev => ({ ...prev, priority: value }))}
                             >
-                                <SelectTrigger>
+                                <SelectTrigger className="mt-1 w-full">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -154,7 +154,7 @@ export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyF
 
                         <div className="md:col-span-2">
                             <Label htmlFor="tags">Tags</Label>
-                            <div className="space-y-2">
+                            <div className="space-y-2 mt-1">
                                 <Input
                                     id="tags"
                                     value={newTag}

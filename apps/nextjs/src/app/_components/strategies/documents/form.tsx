@@ -67,6 +67,7 @@ export function DocumentForm({ document, strategyId, open, onOpenChange, onSave 
                             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                             placeholder="Enter document title"
                             required
+                            className="mt-1"
                         />
                     </div>
 
@@ -76,7 +77,7 @@ export function DocumentForm({ document, strategyId, open, onOpenChange, onSave 
                             value={formData.type}
                             onValueChange={(value: DocumentType) => setFormData(prev => ({ ...prev, type: value }))}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="mt-1">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -98,7 +99,7 @@ export function DocumentForm({ document, strategyId, open, onOpenChange, onSave 
                             value={formData.status}
                             onValueChange={(value: 'draft' | 'published') => setFormData(prev => ({ ...prev, status: value }))}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="mt-1">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
