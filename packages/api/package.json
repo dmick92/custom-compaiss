@@ -16,6 +16,8 @@
     "dev": "tsc",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
+    "seed": "npx tsx seed.ts",
+    "seed:check": "npx tsx -e \"import { config } from 'dotenv'; config(); console.log('POSTGRES_URL:', process.env.POSTGRES_URL ? '✅ Set' : '❌ Missing');\"",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
@@ -24,6 +26,7 @@
     "@acme/validators": "workspace:*",
     "@acme/authz": "workspace:*",
     "@trpc/server": "catalog:",
+    "dotenv": "^16.4.5",
     "superjson": "2.2.2",
     "zod": "catalog:"
   },
@@ -33,6 +36,8 @@
     "@acme/tsconfig": "workspace:*",
     "eslint": "catalog:",
     "prettier": "catalog:",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
     "typescript": "catalog:"
   },
   "prettier": "@acme/prettier-config"

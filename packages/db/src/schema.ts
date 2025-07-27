@@ -62,6 +62,7 @@ export const Project = pgTable("project", (t) => ({
   flowData: t.json().notNull(),
   priority: projectPriorityEnum("priority").notNull().default("Medium"),
   orgId: t.text().notNull().references(() => organization.id, { onDelete: "cascade" }),
+  startDate: t.timestamp({ mode: "date", withTimezone: true }).notNull().defaultNow(),
   createdAt: t
     .timestamp({ mode: "date", withTimezone: true })
     .defaultNow()
