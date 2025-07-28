@@ -8,6 +8,7 @@ export interface Strategy {
     updatedAt: Date;
     tags: string[];
     owner: string;
+    processId?: string; // Optional link to associated process
 }
 
 export interface Document {

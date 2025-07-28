@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Target, BarChart3, Filter, Check, Circle, X, Calendar, Edit2, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, Target, BarChart3, Filter, Check, Circle, X, Calendar, Edit2, Trash2, AlertTriangle, Link as LinkIcon } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
@@ -17,6 +17,8 @@ import {
     DialogTitle,
 } from '~/components/ui/dialog';
 import { priorities, PriorityBadge, PrioritySelectOptions } from '~/app/_components/priority';
+import { mockStrategies } from '~/app/lib/mock-data';
+import Link from 'next/link';
 
 
 
@@ -39,6 +41,7 @@ export interface OKR {
     createdAt: Date;
     updatedAt: Date;
     priority: (typeof priorities)[number];
+    strategyId?: string; // Optional link to associated strategy
 }
 
 export interface CreateOKRData {
@@ -46,6 +49,7 @@ export interface CreateOKRData {
     keyResults: string[];
     quarter: string;
     priority?: (typeof priorities)[number];
+    strategyId?: string;
 }
 
 function App() {
@@ -77,6 +81,7 @@ function App() {
             createdAt: new Date('2025-01-01'),
             updatedAt: new Date('2025-01-15'),
             priority: 'High',
+            strategyId: '1', // Digital Transformation Initiative
         },
         {
             id: '2',
@@ -99,6 +104,7 @@ function App() {
             createdAt: new Date('2025-01-05'),
             updatedAt: new Date('2025-01-20'),
             priority: 'Medium',
+            strategyId: '4', // Product Innovation Framework
         },
     ]);
 
@@ -124,6 +130,7 @@ function App() {
             createdAt: new Date(),
             updatedAt: new Date(),
             priority: data.priority || 'Medium',
+            strategyId: data.strategyId,
         };
 
         setOkrs([newOKR, ...okrs]);
@@ -430,6 +437,7 @@ const CreateOKRModal: React.FC<CreateOKRModalProps> = ({
     const [keyResults, setKeyResults] = useState(['']);
     const [quarter, setQuarter] = useState('Q1 2025');
     const [priority, setPriority] = useState<(typeof priorities)[number]>('Medium');
+    const [strategyId, setStrategyId] = useState<string>('');
 
     const handleAddKeyResult = () => {
         setKeyResults([...keyResults, '']);
@@ -454,6 +462,7 @@ const CreateOKRModal: React.FC<CreateOKRModalProps> = ({
                 keyResults: validKeyResults,
                 quarter,
                 priority,
+                strategyId: strategyId || undefined,
             });
 
             // Reset form
@@ -461,6 +470,7 @@ const CreateOKRModal: React.FC<CreateOKRModalProps> = ({
             setKeyResults(['']);
             setQuarter('Q1 2025');
             setPriority('Medium');
+            setStrategyId('');
             onClose();
         }
     };
@@ -486,33 +496,51 @@ const CreateOKRModal: React.FC<CreateOKRModalProps> = ({
                     </p>
                 </div>
 
-                <div>
-                    <Label className="mb-2">
-                        Quarter
-                    </Label>
-                    <Select
-                        value={quarter}
-                        onValueChange={setQuarter}
-                    >
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {quarters.map(q => (
-                                <SelectItem key={q} value={q}>{q}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                <div className='flex flex-row gap-2 w-full'>
+                    <div className=' w-full'>
+                        <Label className="mb-2">
+                            Quarter
+                        </Label>
+                        <Select
+                            value={quarter}
+                            onValueChange={setQuarter}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {quarters.map(q => (
+                                    <SelectItem key={q} value={q}>{q}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
+                    <div className=' w-full'>
+                        <Label className="mb-2">Priority</Label>
+                        <Select value={priority} onValueChange={v => setPriority(v as (typeof priorities)[number])}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <PrioritySelectOptions reverse />
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
                 <div>
-                    <Label className="mb-2">Priority</Label>
-                    <Select value={priority} onValueChange={v => setPriority(v as (typeof priorities)[number])}>
-                        <SelectTrigger>
-                            <SelectValue />
+                    <Label className="mb-2">Associated Strategy (Optional)</Label>
+                    <Select value={strategyId} onValueChange={setStrategyId}>
+                        <SelectTrigger className="mt-1 w-full">
+                            <SelectValue placeholder="Select a strategy to link" />
                         </SelectTrigger>
                         <SelectContent>
-                            <PrioritySelectOptions reverse />
+                            <SelectItem value="0">No strategy linked</SelectItem>
+                            {mockStrategies.map((strategy) => (
+                                <SelectItem key={strategy.id} value={strategy.id}>
+                                    {strategy.title}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
@@ -664,12 +692,14 @@ const EditOKRModal: React.FC<EditOKRModalProps> = ({
     const [keyResults, setKeyResults] = useState<string[]>([]);
     const [quarter, setQuarter] = useState('Q1 2025');
     const [priority, setPriority] = useState<(typeof priorities)[number]>('Medium');
+    const [strategyId, setStrategyId] = useState<string>('');
     useEffect(() => {
         if (okr) {
             setObjective(okr.objective);
             setKeyResults(okr.keyResults.map(kr => kr.description));
             setQuarter(okr.quarter);
             setPriority(okr.priority || 'Medium');
+            setStrategyId(okr.strategyId || '');
         }
     }, [okr]);
 
@@ -708,6 +738,7 @@ const EditOKRModal: React.FC<EditOKRModalProps> = ({
                 quarter,
                 updatedAt: new Date(),
                 priority,
+                strategyId: strategyId || undefined,
             };
 
             onSubmit(updatedOKR);
@@ -735,33 +766,55 @@ const EditOKRModal: React.FC<EditOKRModalProps> = ({
                     />
                 </div>
 
-                <div>
-                    <Label className="mb-2">
-                        Quarter
-                    </Label>
-                    <Select
-                        value={quarter}
-                        onValueChange={setQuarter}
-                    >
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {quarters.map(q => (
-                                <SelectItem key={q} value={q}>{q}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                <div className='flex flex-row gap-2 w-full'>
+                    <div className=' w-full'>
+                        <Label className="mb-2">
+                            Quarter
+                        </Label>
+                        <Select
+                            value={quarter}
+                            onValueChange={setQuarter}
+                        >
+                            <SelectTrigger className="mt-1 w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {quarters.map(q => (
+                                    <SelectItem key={q} value={q}>{q}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className=' w-full'>
+                        <Label className="mb-2">Priority</Label>
+                        <Select
+                        >
+                            <SelectTrigger className="mt-1 w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="low">Low</SelectItem>
+                                <SelectItem value="medium">Medium</SelectItem>
+                                <SelectItem value="high">High</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
                 <div>
-                    <Label className="mb-2">Priority</Label>
-                    <Select value={priority} onValueChange={v => setPriority(v as (typeof priorities)[number])}>
-                        <SelectTrigger>
-                            <SelectValue />
+                    <Label className="mb-2">Associated Strategy (Optional)</Label>
+                    <Select value={strategyId} onValueChange={setStrategyId}>
+                        <SelectTrigger className="mt-1 w-full">
+                            <SelectValue placeholder="Select a strategy to link" />
                         </SelectTrigger>
                         <SelectContent>
-                            <PrioritySelectOptions reverse />
+                            <SelectItem value="0">No strategy linked</SelectItem>
+                            {mockStrategies.map((strategy) => (
+                                <SelectItem key={strategy.id} value={strategy.id}>
+                                    {strategy.title}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
@@ -967,6 +1020,17 @@ const OKRCard: React.FC<OKRCardProps> = ({
                                 <span className="mx-2">•</span>
                                 <PriorityBadge priority={okr.priority} />
                             </div>
+                            {okr.strategyId && (
+                                <div className="flex items-center gap-1 text-sm">
+                                    <LinkIcon className="h-3 w-3 text-blue-500" />
+                                    <Link
+                                        href={`/plan/strategies/${okr.strategyId}`}
+                                        className="text-blue-500 hover:text-blue-600 hover:underline"
+                                    >
+                                        View Associated Strategy
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     </div>
 

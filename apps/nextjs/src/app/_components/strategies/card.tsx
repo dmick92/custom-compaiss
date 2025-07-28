@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/com
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '~/components/ui/dropdown-menu';
-import { Eye, Edit, Trash2, MoreHorizontal, Calendar, User } from 'lucide-react';
+import { Eye, Edit, Trash2, MoreHorizontal, Calendar, User, Link as LinkIcon } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -51,7 +51,7 @@ export function StrategyCard({ strategy, onEdit, onDelete }: StrategyCardProps) 
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                                <Link href={`/strategies/${strategy.id}`} className="flex items-center">
+                                <Link href={`/plan/strategies/${strategy.id}`} className="flex items-center">
                                     <Eye className="mr-2 h-4 w-4" />
                                     View
                                 </Link>
@@ -93,6 +93,18 @@ export function StrategyCard({ strategy, onEdit, onDelete }: StrategyCardProps) 
                         <span>{formatDistanceToNow(strategy.updatedAt, { addSuffix: true })}</span>
                     </div>
                 </div>
+
+                {strategy.processId && (
+                    <div className="flex items-center gap-1 mt-3 text-sm">
+                        <LinkIcon className="h-3 w-3 text-blue-500" />
+                        <Link
+                            href={`/plan/processes/${strategy.processId}`}
+                            className="text-blue-500 hover:text-blue-600 hover:underline"
+                        >
+                            View Associated Process
+                        </Link>
+                    </div>
+                )}
 
                 {strategy.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-3">

@@ -1,5 +1,29 @@
 import { Strategy, Document } from '~/types/strategy';
 
+// Mock processes for linking with strategies
+export const mockProcesses = [
+    {
+        id: 'process-1',
+        name: 'Digital Transformation Process',
+        description: 'End-to-end process for implementing digital transformation initiatives'
+    },
+    {
+        id: 'process-2',
+        name: 'Market Expansion Process',
+        description: 'Systematic approach to expanding into new markets'
+    },
+    {
+        id: 'process-3',
+        name: 'Product Innovation Process',
+        description: 'Structured process for product development and innovation'
+    },
+    {
+        id: 'process-4',
+        name: 'Customer Onboarding Process',
+        description: 'Streamlined customer onboarding and activation process'
+    }
+];
+
 export const mockStrategies: Strategy[] = [
     {
         id: '1',
@@ -10,7 +34,8 @@ export const mockStrategies: Strategy[] = [
         createdAt: new Date('2024-01-15'),
         updatedAt: new Date('2024-12-15'),
         tags: ['digital', 'transformation', 'technology'],
-        owner: 'Sarah Johnson'
+        owner: 'Sarah Johnson',
+        processId: 'process-1'
     },
     {
         id: '2',
@@ -21,7 +46,8 @@ export const mockStrategies: Strategy[] = [
         createdAt: new Date('2024-02-01'),
         updatedAt: new Date('2024-12-10'),
         tags: ['expansion', 'market', 'growth'],
-        owner: 'Michael Chen'
+        owner: 'Michael Chen',
+        processId: 'process-2'
     },
     {
         id: '3',
@@ -43,7 +69,8 @@ export const mockStrategies: Strategy[] = [
         createdAt: new Date('2024-04-05'),
         updatedAt: new Date('2024-12-12'),
         tags: ['innovation', 'product', 'development'],
-        owner: 'David Rodriguez'
+        owner: 'David Rodriguez',
+        processId: 'process-3'
     }
 ];
 

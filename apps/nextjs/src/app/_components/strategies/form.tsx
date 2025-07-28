@@ -10,6 +10,7 @@ import { Label } from '~/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { Badge } from '~/components/ui/badge';
 import { X } from 'lucide-react';
+import { mockProcesses } from '~/app/lib/mock-data';
 
 interface StrategyFormProps {
     strategy?: Strategy | null;
@@ -25,7 +26,8 @@ export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyF
         status: (strategy?.status || 'draft') as StrategyStatus,
         priority: (strategy?.priority || 'medium') as StrategyPriority,
         owner: strategy?.owner || '',
-        tags: strategy?.tags || []
+        tags: strategy?.tags || [],
+        processId: strategy?.processId || ''
     });
     const [newTag, setNewTag] = useState('');
 
@@ -40,7 +42,8 @@ export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyF
                 status: 'draft',
                 priority: 'medium',
                 owner: '',
-                tags: []
+                tags: [],
+                processId: ''
             });
         }
     };
@@ -150,6 +153,26 @@ export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyF
                                 placeholder="Enter strategy owner"
                                 required
                             />
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <Label htmlFor="process">Associated Process (Optional)</Label>
+                            <Select
+                                value={formData.processId}
+                                onValueChange={(value) => setFormData(prev => ({ ...prev, processId: value }))}
+                            >
+                                <SelectTrigger className="mt-1 w-full">
+                                    <SelectValue placeholder="Select a process to link" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="0">No process linked</SelectItem>
+                                    {mockProcesses.map((process) => (
+                                        <SelectItem key={process.id} value={process.id}>
+                                            {process.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="md:col-span-2">
