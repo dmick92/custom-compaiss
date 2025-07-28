@@ -22,9 +22,9 @@
   },
   "dependencies": {
     "@acme/auth": "workspace:*",
+    "@acme/authz": "workspace:*",
     "@acme/db": "workspace:*",
     "@acme/validators": "workspace:*",
-    "@acme/authz": "workspace:*",
     "@trpc/server": "catalog:",
     "dotenv": "^16.4.5",
     "superjson": "2.2.2",
