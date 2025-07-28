@@ -16,7 +16,7 @@ export const processRouter = {
     .input(z.object({ id: z.string() }))
     .use(requirePermission({
       resourceType: "process",
-      action: "view",
+      action: "read",
       getResourceId: ({ input }) => (input as { id?: string }).id ?? "",
     }))
     .query(async ({ input, ctx }) => {
@@ -63,7 +63,7 @@ export const processRouter = {
     .input(CreateProcessSchema)
     .use(requirePermission({
       resourceType: "process",
-      action: "edit",
+      action: "update",
       getResourceId: ({ input }) => (input as { id?: string }).id ?? "",
     }))
     .mutation(async ({ input, ctx }) => {
@@ -78,9 +78,12 @@ export const processRouter = {
         res = updated[0];
       } else {
         // Create new process
+        const orgId = ctx.session?.session.activeOrganizationId;
+        if (!orgId) throw new TRPCError({ code: "BAD_REQUEST", message: "No active organization" });
+
         const created = await ctx.db
           .insert(Process)
-          .values(input)
+          .values({ ...input, orgId })
           .returning();
         res = created[0];
 

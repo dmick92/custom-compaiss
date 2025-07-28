@@ -34,14 +34,14 @@ const navigationLinks = [
     type: "description",
     items: [
       {
-        href: "/plan/strategies",
-        label: "Strategies",
-        description: "Browse all strategies in the library.",
-      },
-      {
         href: "/plan/goals",
         label: "Goals",
         description: "Browse all goals in the library.",
+      },
+      {
+        href: "/plan/strategies",
+        label: "Strategies",
+        description: "Browse all strategies in the library.",
       },
       {
         href: "/plan/processes",
