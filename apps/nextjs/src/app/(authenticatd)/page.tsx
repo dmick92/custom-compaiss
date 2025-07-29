@@ -211,11 +211,10 @@ export default function HomePage() {
       children: [
         { text: 'User registration with email verification', done: false },
         { text: 'User login/logout with session management', done: true },
-        { text: 'Password reset functionality', done: false },
-        { text: 'User profile CRUD operations', done: false },
+        { text: 'Password reset functionality', done: true },
         { text: 'User avatar upload and management', done: false },
-        { text: 'User account settings (email, password, preferences)', done: false },
-        { text: 'User security settings (2FA, session management)', done: false },
+        { text: 'User account settings (email, password, preferences)', done: true },
+        { text: 'User security settings (2FA, session management)', done: true },
         { text: 'User activity log tracking', done: false },
       ],
     },
@@ -223,11 +222,10 @@ export default function HomePage() {
       text: 'Organization Management',
       done: false,
       children: [
-        { text: 'Organization CRUD operations', done: false },
-        { text: 'Organization member invitation system', done: false },
-        { text: 'Organization member management (add, remove, roles)', done: false },
-        { text: 'Organization role assignment (owner, admin, member)', done: false },
-        { text: 'Organization settings and configuration', done: false },
+        { text: 'Organization member invitation system', done: true },
+        { text: 'Organization member management (add, remove, roles)', done: true },
+        { text: 'Organization role assignment (owner, admin, member)', done: true },
+        { text: 'Organization settings and configuration', done: true },
         { text: 'Organization activity log tracking', done: false },
         { text: 'Organization ownership transfer', done: false },
       ],
@@ -245,18 +243,6 @@ export default function HomePage() {
       ],
     },
     {
-      text: 'Strategy Management',
-      done: false,
-      children: [
-        { text: 'Strategy CRUD operations', done: false },
-        { text: 'Strategy sharing and collaboration', done: false },
-        { text: 'Strategy assignment to users/teams', done: false },
-        { text: 'Strategy versioning and history', done: false },
-        { text: 'Strategy activity log tracking', done: false },
-        { text: 'Strategy export/import functionality', done: false },
-      ],
-    },
-    {
       text: 'Goal/OKR Management',
       done: false,
       children: [
@@ -266,6 +252,18 @@ export default function HomePage() {
         { text: 'Goal/OKR sharing and collaboration', done: false },
         { text: 'Goal/OKR activity log tracking', done: false },
         { text: 'Goal/OKR reporting and analytics', done: false },
+      ],
+    },
+    {
+      text: 'Strategy Management',
+      done: false,
+      children: [
+        { text: 'Strategy CRUD operations', done: false },
+        { text: 'Strategy sharing and collaboration', done: false },
+        { text: 'Strategy assignment to users/teams', done: false },
+        { text: 'Strategy versioning and history', done: false },
+        { text: 'Strategy activity log tracking', done: false },
+        { text: 'Strategy export/import functionality', done: false },
       ],
     },
     {

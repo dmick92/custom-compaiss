@@ -98,3 +98,65 @@ export const Task = pgTable("task", (t) => ({
 }));
 
 export const CreateTaskSchema = createInsertSchema(Task)
+
+export const Objective = pgTable("objective", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  name: t.varchar({ length: 255 }).notNull().unique(),
+  priority: projectPriorityEnum("priority").notNull().default("Medium"),
+  orgId: t.text().notNull().references(() => organization.id, { onDelete: "cascade" }),
+  strategyId: t.uuid().references(() => Strategy.id, { onDelete: "cascade" }),
+  quarter: t.varchar({ length: 255 }).notNull(),
+  createdAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .notNull()
+    .$onUpdateFn(() => sql`now()`),
+}));
+
+export const CreateObjectiveSchema = createInsertSchema(Objective, { orgId: z.optional(z.never()) })
+
+
+export const KeyResult = pgTable("key_result", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  objectiveId: t.uuid().notNull().references(() => Objective.id, { onDelete: "cascade" }),
+  description: t.text().notNull(),
+  completed: t.boolean().notNull().default(false),
+  progress: t.integer().notNull().default(0),
+  dueDate: t.timestamp({ mode: "date", withTimezone: true }),
+  notes: t.text(),
+  createdAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .notNull()
+    .$onUpdateFn(() => sql`now()`),
+}));
+export const CreateKeyResultSchema = createInsertSchema(KeyResult)
+export const UpdateObjectiveSchema = CreateObjectiveSchema.partial().extend({
+  id: z.string(),
+  keyResults: z.array(CreateKeyResultSchema.omit({ objectiveId: true })).optional(),
+});
+
+
+export const Strategy = pgTable("strategy", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  name: t.varchar({ length: 255 }).notNull().unique(),
+  description: t.text(),
+  status: processStatusEnum("status").notNull(),
+  priority: projectPriorityEnum("priority").notNull().default("Medium"),
+  orgId: t.text().notNull().references(() => organization.id, { onDelete: "cascade" }),
+  processId: t.uuid().references(() => Process.id, { onDelete: "cascade" }),
+  createdAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .notNull()
+    .$onUpdateFn(() => sql`now()`),
+}));
