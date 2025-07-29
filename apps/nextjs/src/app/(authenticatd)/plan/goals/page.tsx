@@ -19,94 +19,56 @@ import {
 import { priorities, PriorityBadge, PrioritySelectOptions } from '~/app/_components/priority';
 import { mockStrategies } from '~/app/lib/mock-data';
 import Link from 'next/link';
+import { OKR, KeyResult, CreateOKRData } from '~/types/okr';
+import { useTRPC } from '~/trpc/react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-
-
-
-export interface KeyResult {
-    id: string;
-    description: string;
-    completed: boolean;
-    progress: number; // 0-100
-    owner?: string;
-    dueDate?: string;
-    notes?: string;
-}
-
-export interface OKR {
-    id: string;
-    objective: string;
-    keyResults: KeyResult[];
-    quarter: string;
-    createdAt: Date;
-    updatedAt: Date;
-    priority: (typeof priorities)[number];
-    strategyId?: string; // Optional link to associated strategy
-}
-
-export interface CreateOKRData {
-    objective: string;
-    keyResults: string[];
-    quarter: string;
-    priority?: (typeof priorities)[number];
-    strategyId?: string;
-}
 
 function App() {
-    const [okrs, setOkrs] = useState<OKR[]>([
-        {
-            id: '1',
-            objective: 'Launch innovative mobile app that delights users and drives business growth',
-            keyResults: [
-                {
-                    id: 'kr1',
-                    description: 'Achieve 10,000 app downloads in the first month',
-                    completed: false,
-                    progress: 75,
-                },
-                {
-                    id: 'kr2',
-                    description: 'Maintain 4.5+ star rating on app stores',
-                    completed: true,
-                    progress: 100,
-                },
-                {
-                    id: 'kr3',
-                    description: 'Generate $50K in revenue from premium features',
-                    completed: false,
-                    progress: 30,
-                },
-            ],
-            quarter: 'Q1 2025',
-            createdAt: new Date('2025-01-01'),
-            updatedAt: new Date('2025-01-15'),
-            priority: 'High',
-            strategyId: '1', // Digital Transformation Initiative
-        },
-        {
-            id: '2',
-            objective: 'Build a high-performance engineering team culture',
-            keyResults: [
-                {
-                    id: 'kr4',
-                    description: 'Hire 5 senior engineers by end of quarter',
-                    completed: false,
-                    progress: 60,
-                },
-                {
-                    id: 'kr5',
-                    description: 'Implement weekly code review process',
-                    completed: true,
-                    progress: 100,
-                },
-            ],
-            quarter: 'Q1 2025',
-            createdAt: new Date('2025-01-05'),
-            updatedAt: new Date('2025-01-20'),
-            priority: 'Medium',
-            strategyId: '4', // Product Innovation Framework
-        },
-    ]);
+    const trpc = useTRPC();
+
+    const objectives = useQuery(trpc.objective.listWithKeyResults.queryOptions());
+    const createObjective = useMutation(trpc.objective.create.mutationOptions({
+        onSuccess: () => {
+            objectives.refetch();
+        }
+    }));
+    const deleteObjective = useMutation(trpc.objective.delete.mutationOptions({
+        onSuccess: () => {
+            objectives.refetch();
+        }
+    }));
+    const updateObjective = useMutation(trpc.objective.update.mutationOptions({
+        onSuccess: () => {
+            objectives.refetch();
+        }
+    }));
+
+    const [okrs, setOkrs] = useState<OKR[]>([]);
+
+    useEffect(() => {
+        if (objectives.data) {
+            setOkrs(objectives.data.map(objective => {
+                return {
+                    id: objective.id,
+                    objective: objective.name,
+                    keyResults: objective.keyResults?.map((kr: any) => ({
+                        id: kr.id,
+                        description: kr.description,
+                        completed: kr.completed,
+                        progress: kr.progress,
+                        dueDate: kr.dueDate,
+                        notes: kr.notes,
+                    })) || [],
+                    quarter: objective.quarter,
+                    createdAt: objective.createdAt,
+                    updatedAt: objective.updatedAt,
+                    priority: objective.priority,
+                    strategyId: objective.strategyId || undefined,
+                }
+            }));
+        }
+    }, [objectives.data]);
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -133,7 +95,19 @@ function App() {
             strategyId: data.strategyId,
         };
 
-        setOkrs([newOKR, ...okrs]);
+        createObjective.mutate({
+            name: newOKR.objective,
+            quarter: newOKR.quarter,
+            priority: newOKR.priority,
+            strategyId: newOKR.strategyId,
+            keyResults: newOKR.keyResults.map(kr => ({
+                description: kr.description,
+                completed: kr.completed,
+                progress: kr.progress,
+                dueDate: kr.dueDate ? new Date(kr.dueDate) : undefined,
+                notes: kr.notes,
+            })),
+        });
     };
 
     const handleEditOKR = (okr: OKR) => {
@@ -142,7 +116,22 @@ function App() {
     };
 
     const handleUpdateOKR = (updatedOKR: OKR) => {
-        setOkrs(okrs.map(okr => okr.id === updatedOKR.id ? updatedOKR : okr));
+        updateObjective.mutate({
+            id: updatedOKR.id,
+            name: updatedOKR.objective,
+            quarter: updatedOKR.quarter,
+            priority: updatedOKR.priority,
+            strategyId: updatedOKR.strategyId,
+            keyResults: updatedOKR.keyResults.map(kr => ({
+                description: kr.description,
+                completed: kr.completed,
+                progress: kr.progress,
+                dueDate: kr.dueDate ? new Date(kr.dueDate) : undefined,
+                notes: kr.notes,
+            })),
+        });
+        setIsEditModalOpen(false);
+        setEditingOKR(null);
     };
 
     const handleDeleteOKR = (okr: OKR) => {
@@ -152,7 +141,8 @@ function App() {
 
     const confirmDeleteOKR = () => {
         if (deletingOKR) {
-            setOkrs(okrs.filter(okr => okr.id !== deletingOKR.id));
+            //setOkrs(okrs.filter(okr => okr.id !== deletingOKR.id));
+            deleteObjective.mutate(deletingOKR.id);
             setDeletingOKR(null);
             setIsDeleteModalOpen(false);
         }

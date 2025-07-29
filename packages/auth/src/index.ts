@@ -2,7 +2,7 @@ import type { BetterAuthOptions } from "better-auth";
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { oAuthProxy, organization } from "better-auth/plugins";
+import { oAuthProxy, organization, username } from "better-auth/plugins";
 
 import { db } from "@acme/db/client";
 import { permissions, spicedbClient } from "@acme/authz";
@@ -41,7 +41,7 @@ export function initAuth(options: {
               `organization:${organization.id}`
             ).execute(spicedbClient);
           }
-        }
+        },
       }),
     ],
     socialProviders: {
@@ -54,6 +54,7 @@ export function initAuth(options: {
     emailAndPassword: {
       enabled: true,
     },
+
     trustedOrigins: ["expo://"],
   } satisfies BetterAuthOptions;
 
