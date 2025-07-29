@@ -246,7 +246,7 @@ export default function HomePage() {
       text: 'Goal/OKR Management',
       done: false,
       children: [
-        { text: 'Goal/OKR CRUD operations', done: false },
+        { text: 'Goal/OKR CRUD operations', done: true },
         { text: 'Goal/OKR assignment to users/teams', done: false },
         { text: 'Goal/OKR progress tracking', done: false },
         { text: 'Goal/OKR sharing and collaboration', done: false },

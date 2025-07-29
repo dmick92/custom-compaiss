@@ -76,7 +76,7 @@ export const objectiveRouter = {
 
         if (!objective) throw new TRPCError({ code: "BAD_REQUEST", message: "Objective not found" });
 
-        let newKeyResults = [];
+        let newKeyResults: typeof KeyResult.$inferSelect[] = [];
 
         if (keyResults) {
           // ✅ Delete old key results and insert new ones
