@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Strategy, StrategyStatus, StrategyPriority } from '~/types/strategy';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '~/components/ui/dialog';
 import { Button } from '~/components/ui/button';
@@ -11,29 +11,71 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import { Badge } from '~/components/ui/badge';
 import { X } from 'lucide-react';
 import { mockProcesses } from '~/app/lib/mock-data';
+import { useTRPC } from '~/trpc/react';
+import { useQuery } from '@tanstack/react-query';
+
+type OrgUser = { id: string; name?: string | null; email: string; image?: string | null };
 
 interface StrategyFormProps {
     strategy?: Strategy | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onSave: (strategy: Omit<Strategy, 'id' | 'createdAt' | 'updatedAt'>) => void;
+    // Keep 'owner' to satisfy existing Strategy UI type, but we will not edit it directly anymore
+    onSave: (strategy: Omit<Strategy, 'id' | 'createdAt' | 'updatedAt'> & { ownerUserId?: string | null }) => void;
 }
 
 export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyFormProps) {
+    const trpc = useTRPC();
     const [formData, setFormData] = useState({
         title: strategy?.title || '',
         description: strategy?.description || '',
         status: (strategy?.status || 'draft') as StrategyStatus,
         priority: (strategy?.priority || 'medium') as StrategyPriority,
-        owner: strategy?.owner || '',
+        ownerUserId: undefined as string | undefined,
+        owner: strategy?.owner || '', // keep for type compatibility on submit payload
         tags: strategy?.tags || [],
         processId: strategy?.processId || ''
     });
     const [newTag, setNewTag] = useState('');
 
+    // Load users for active org with standard tRPC react hook
+    const usersQuery = useQuery(trpc.user.listByActiveOrg.queryOptions());
+    //const usersQuery = (trpc.user.listByActiveOrg as any).useQuery?.() ?? { data: [], isLoading: false };
+
+    // Keep form state in sync when editingStrategy changes or dialog opens
+    useEffect(() => {
+        // Try to pre-populate ownerUserId from the active-org user list by matching the current 'owner' string
+        const users: OrgUser[] = (((usersQuery as any).data) ?? []) as OrgUser[];
+        const matchedOwnerId =
+            strategy?.owner
+                ? users.find(
+                    (u) =>
+                        (u.name && u.name.toLowerCase() === strategy.owner.toLowerCase()) ||
+                        (u.email && u.email.toLowerCase() === strategy.owner.toLowerCase())
+                )?.id
+                : undefined;
+
+        setFormData({
+            title: strategy?.title || '',
+            description: strategy?.description || '',
+            status: (strategy?.status || 'draft') as StrategyStatus,
+            priority: (strategy?.priority || 'medium') as StrategyPriority,
+            ownerUserId: matchedOwnerId, // pre-populate when editing if we can match by name/email
+            owner: strategy?.owner || '',
+            tags: strategy?.tags || [],
+            processId: strategy?.processId || ''
+        });
+        setNewTag('');
+        // include usersQuery.data so prefill happens once users load
+    }, [strategy, open, (usersQuery as any).data]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
+        // Provide owner (string) for type compatibility, but the server uses ownerUserId
+        onSave({
+            ...formData,
+            owner: formData.owner ?? '',
+        });
         onOpenChange(false);
         if (!strategy) {
             setFormData({
@@ -41,6 +83,7 @@ export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyF
                 description: '',
                 status: 'draft',
                 priority: 'medium',
+                ownerUserId: undefined,
                 owner: '',
                 tags: [],
                 processId: ''
@@ -145,14 +188,33 @@ export function StrategyForm({ strategy, open, onOpenChange, onSave }: StrategyF
                         </div>
 
                         <div className="md:col-span-2">
-                            <Label htmlFor="owner">Owner</Label>
-                            <Input
-                                id="owner"
-                                value={formData.owner}
-                                onChange={(e) => setFormData(prev => ({ ...prev, owner: e.target.value }))}
-                                placeholder="Enter strategy owner"
-                                required
-                            />
+                            <Label htmlFor="ownerUserId">Owner</Label>
+                            <Select
+                                value={formData.ownerUserId ?? 'none'}
+                                onValueChange={(value) =>
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        ownerUserId: value === 'none' ? undefined : value
+                                    }))
+                                }
+                            >
+                                <SelectTrigger className="mt-1 w-full">
+                                    <SelectValue placeholder={usersQuery.isLoading ? 'Loading users...' : 'Select a user'} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">Unassigned</SelectItem>
+                                    {(((usersQuery as any).data ?? []) as OrgUser[]).map((u: OrgUser) => (
+                                        <SelectItem key={u.id} value={u.id}>
+                                            {u.name ?? u.email ?? u.id}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {strategy && !formData.ownerUserId && ((usersQuery as any).data?.length ?? 0) > 0 && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Tip: We couldn’t match the existing owner; please choose one.
+                                </p>
+                            )}
                         </div>
 
                         <div className="md:col-span-2">

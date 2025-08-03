@@ -258,7 +258,7 @@ export default function HomePage() {
       text: 'Strategy Management',
       done: false,
       children: [
-        { text: 'Strategy CRUD operations', done: false },
+        { text: 'Strategy CRUD operations', done: true },
         { text: 'Strategy sharing and collaboration', done: false },
         { text: 'Strategy assignment to users/teams', done: false },
         { text: 'Strategy versioning and history', done: false },
@@ -283,7 +283,7 @@ export default function HomePage() {
       text: 'Process Management',
       done: false,
       children: [
-        { text: 'Process CRUD operations', done: false },
+        { text: 'Process CRUD operations', done: true },
         { text: 'Process designer UI improvements', done: true },
         { text: 'Process execution tracking', done: false },
         { text: 'Process assignment to users/teams', done: false },
