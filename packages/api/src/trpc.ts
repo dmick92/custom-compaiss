@@ -31,12 +31,15 @@ export const createTRPCContext = async (opts: {
   headers: Headers;
   auth: Auth;
 }) => {
-  const authApi = opts.auth.api;
+  // Prefer server SDK instance for org ops; keep api for getSession
+  const auth = opts.auth;
+  const authApi = auth.api;
   const session = await authApi.getSession({
     headers: opts.headers,
   });
   return {
-    authApi,
+    auth,     // expose full server SDK instance for routers (organization ops)
+    authApi,  // keep api wrapper for existing usages (getSession, etc.)
     session,
     db,
   };

@@ -22,7 +22,7 @@ import {
 } from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
 import { env } from "~/env";
-import { UserAvatar, UserButton } from "@daveyplate/better-auth-ui";
+import { OrganizationSwitcher, UserAvatar, UserButton } from "@daveyplate/better-auth-ui";
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -396,6 +396,8 @@ export default function Header() {
             </NavigationMenu>
           )}
           <ModeToggle />
+          <OrganizationSwitcher hidePersonal classNames={{ trigger: { organization: { subtitle: "hidden" } } }} />
+
           <UserButton
             size="icon"
             localization={{

@@ -21,6 +21,22 @@ export const CreatePostSchema = createInsertSchema(Post, {
 
 export * from "./auth-schema";
 
+/**
+ * User preferences: persists last-used organization for a user.
+ * - userId references auth user.id (text), unique to ensure one row per user
+ * - lastOrganizationId references auth organization.id (text), nullable
+ */
+export const UserPreferences = pgTable("user_preferences", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  userId: t.text().notNull().unique().references(() => user.id, { onDelete: "cascade" }),
+  lastOrganizationId: t.text().references(() => organization.id, { onDelete: "set null" }),
+  createdAt: t.timestamp({ mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: t.timestamp({ mode: "date", withTimezone: true }).notNull().$onUpdateFn(() => sql`now()`),
+}));
+
+export const CreateUserPreferencesSchema = createInsertSchema(UserPreferences);
+export const UpdateUserPreferencesSchema = createUpdateSchema(UserPreferences);
+
 export const processStatusEnum = pgEnum("ProcessStatus", [
   "DRAFT",
   "ACTIVE",
@@ -151,6 +167,7 @@ export const Strategy = pgTable("strategy", (t) => ({
   priority: projectPriorityEnum("priority").notNull().default("Medium"),
   orgId: t.text().notNull().references(() => organization.id, { onDelete: "cascade" }),
   processId: t.uuid().references(() => Process.id, { onDelete: "cascade" }),
+  ownerUserId: t.text().references(() => user.id, { onDelete: "set null" }),
   createdAt: t
     .timestamp({ mode: "date", withTimezone: true })
     .defaultNow()
