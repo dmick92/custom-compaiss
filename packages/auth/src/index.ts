@@ -52,6 +52,17 @@ export function initAuth(options: {
     emailAndPassword: {
       enabled: true,
     },
+    emailVerification: {
+      sendVerificationEmail: async ({ user, url, token }, request) => {
+        //todo build send email function and connect to email provider
+        // await sendEmail({
+        //     to: user.email,
+        //     subject: 'Verify your email address',
+        //     text: `Click the link to verify your email: ${url}`
+        // })
+      }
+
+    },
     trustedOrigins: ["expo://"],
 
     /**

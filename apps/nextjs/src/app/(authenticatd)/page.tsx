@@ -209,7 +209,7 @@ export default function HomePage() {
       text: 'Authentication & User Management',
       done: false,
       children: [
-        { text: 'User registration with email verification', done: false },
+        { text: 'User registration with email verification', done: true },
         { text: 'User login/logout with session management', done: true },
         { text: 'Password reset functionality', done: true },
         { text: 'User avatar upload and management', done: false },
