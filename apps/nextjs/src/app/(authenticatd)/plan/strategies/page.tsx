@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Strategy } from '~/types/strategy';
-import { mockStrategies } from '~/app/lib/mock-data';
 import { StrategyCard } from '~/app/_components/strategies/card';
 import { StrategyForm } from '~/app/_components/strategies/form';
 import { Button } from '~/components/ui/button';
@@ -10,10 +9,27 @@ import { Input } from '~/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '~/components/ui/alert-dialog';
 import { Plus, Search, Filter } from 'lucide-react';
+import { useTRPC } from '~/trpc/react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { auth } from '~/auth/server';
 
 export default function StrategiesPage() {
-    const [strategies, setStrategies] = useState<Strategy[]>(mockStrategies);
-    const [filteredStrategies, setFilteredStrategies] = useState<Strategy[]>(mockStrategies);
+    const trpc = useTRPC();
+
+    // Queries
+    const strategiesQuery = useQuery(trpc.strategy.list.queryOptions());
+
+    // Mutations
+    const createStrategy = useMutation(trpc.strategy.create.mutationOptions({
+        onSuccess: () => strategiesQuery.refetch(),
+    }));
+    const updateStrategy = useMutation(trpc.strategy.update.mutationOptions({
+        onSuccess: () => strategiesQuery.refetch(),
+    }));
+    const deleteStrategy = useMutation(trpc.strategy.delete.mutationOptions({
+        onSuccess: () => strategiesQuery.refetch(),
+    }));
+
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [priorityFilter, setPriorityFilter] = useState<string>('all');
@@ -22,8 +38,40 @@ export default function StrategiesPage() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [strategyToDelete, setStrategyToDelete] = useState<string | null>(null);
 
-    // Filter strategies based on search and filters
-    useState(() => {
+    // Map backend Strategy to UI Strategy type
+    const strategies: Strategy[] = useMemo(() => {
+        const rows = strategiesQuery.data ?? [];
+        // Map backend enums to UI enums
+        const mapStatus = (val: any): Strategy['status'] => {
+            const s = String(val).toUpperCase();
+            if (s === 'DRAFT') return 'draft';
+            if (s === 'ACTIVE') return 'active';
+            if (s === 'ARCHIVED') return 'archived';
+            return 'draft';
+        };
+        const mapPriority = (val: any): Strategy['priority'] => {
+            const p = String(val).toUpperCase();
+            if (p === 'HIGH' || p === 'CRITICAL') return 'high';
+            if (p === 'MEDIUM') return 'medium';
+            if (p === 'LOW' || p === 'LOWEST') return 'low';
+            return 'medium';
+        };
+
+        return rows.map((s: any) => ({
+            id: s.id,
+            title: s.name,
+            description: s.description ?? '',
+            status: mapStatus(s.status),
+            priority: mapPriority(s.priority),
+            createdAt: s.createdAt ? new Date(s.createdAt) : new Date(),
+            updatedAt: s.updatedAt ? new Date(s.updatedAt) : new Date(),
+            tags: [], // not modeled in DB; keep empty
+            owner: '', // not modeled in DB; keep empty
+            processId: s.processId ?? undefined,
+        }));
+    }, [strategiesQuery.data]);
+
+    const filteredStrategies = useMemo(() => {
         let filtered = strategies;
 
         if (searchTerm) {
@@ -42,7 +90,7 @@ export default function StrategiesPage() {
             filtered = filtered.filter(strategy => strategy.priority === priorityFilter);
         }
 
-        setFilteredStrategies(filtered);
+        return filtered;
     }, [strategies, searchTerm, statusFilter, priorityFilter]);
 
     const handleCreateStrategy = () => {
@@ -55,24 +103,21 @@ export default function StrategiesPage() {
         setIsFormOpen(true);
     };
 
-    const handleSaveStrategy = (strategyData: Omit<Strategy, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const handleSaveStrategy = (strategyData: Omit<Strategy, 'id' | 'createdAt' | 'updatedAt'> & { ownerUserId?: string | null }) => {
+        // Map UI payload to API schema
+        const payload = {
+            name: strategyData.title,
+            description: strategyData.description,
+            status: (strategyData.status === 'completed' ? 'ACTIVE' : strategyData.status.toUpperCase()) as 'DRAFT' | 'ACTIVE' | 'ARCHIVED',
+            priority: (strategyData.priority === 'low' ? 'Low' : strategyData.priority.charAt(0).toUpperCase() + strategyData.priority.slice(1)) as 'Lowest' | 'Low' | 'Medium' | 'High' | 'Critical',
+            processId: strategyData.processId && strategyData.processId !== '0' ? strategyData.processId : undefined,
+            ownerUserId: strategyData.ownerUserId ?? undefined,
+        };
+
         if (editingStrategy) {
-            // Update existing strategy
-            const updatedStrategy: Strategy = {
-                ...editingStrategy,
-                ...strategyData,
-                updatedAt: new Date()
-            };
-            setStrategies(prev => prev.map(s => s.id === editingStrategy.id ? updatedStrategy : s));
+            updateStrategy.mutate({ id: editingStrategy.id, ...payload });
         } else {
-            // Create new strategy
-            const newStrategy: Strategy = {
-                ...strategyData,
-                id: Math.random().toString(36).substr(2, 9),
-                createdAt: new Date(),
-                updatedAt: new Date()
-            };
-            setStrategies(prev => [newStrategy, ...prev]);
+            createStrategy.mutate(payload as any);
         }
     };
 
@@ -83,7 +128,7 @@ export default function StrategiesPage() {
 
     const confirmDelete = () => {
         if (strategyToDelete) {
-            setStrategies(prev => prev.filter(s => s.id !== strategyToDelete));
+            deleteStrategy.mutate({ id: strategyToDelete });
             setStrategyToDelete(null);
         }
         setDeleteDialogOpen(false);
@@ -91,7 +136,6 @@ export default function StrategiesPage() {
 
     return (
         <div className="container mx-auto space-y-6 p-6">
-
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-6">
@@ -125,7 +169,6 @@ export default function StrategiesPage() {
                                 <SelectItem value="all">All Status</SelectItem>
                                 <SelectItem value="draft">Draft</SelectItem>
                                 <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
                                 <SelectItem value="archived">Archived</SelectItem>
                             </SelectContent>
                         </Select>

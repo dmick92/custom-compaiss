@@ -8,6 +8,7 @@ import { organizationRouter } from "./router/organization";
 import { permissionRouter } from "./router/permission";
 import { taskRouter } from "./router/task";
 import { objectiveRouter } from "./router/objective";
+import { strategyRouter } from "./router/strategy";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
@@ -19,6 +20,7 @@ export const appRouter = createTRPCRouter({
   permission: permissionRouter,
   task: taskRouter,
   objective: objectiveRouter,
+  strategy: strategyRouter,
 });
 
 // export type definition of API
