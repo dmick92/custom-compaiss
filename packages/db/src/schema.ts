@@ -20,6 +20,7 @@ export const CreatePostSchema = createInsertSchema(Post, {
 })
 
 export * from "./auth-schema";
+export * from "./activity";
 
 /**
  * User preferences: persists last-used organization for a user.
