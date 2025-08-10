@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import { pgEnum, pgTable } from "drizzle-orm/pg-core";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod/v4";
-import { organization, user } from "./auth-schema";
+import { organization, team, user } from "./auth-schema";
 
 export const Post = pgTable("post", (t) => ({
   id: t.uuid().notNull().primaryKey().defaultRandom(),
@@ -176,4 +176,19 @@ export const Strategy = pgTable("strategy", (t) => ({
     .timestamp({ mode: "date", withTimezone: true })
     .notNull()
     .$onUpdateFn(() => sql`now()`),
+}));
+
+export const teamMember = pgTable("team_member", (t) => ({
+  id: t.uuid().defaultRandom().primaryKey(),
+  teamId: t.text().notNull().references(() => team.id, { onDelete: "cascade" }),
+  userId: t.text().notNull().references(() => user.id, { onDelete: "cascade" }),
+  role: t.varchar({ length: 255 }).notNull().default("member"),
+  createdAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: t
+    .timestamp({ mode: "date", withTimezone: true })
+    .defaultNow()
+    .notNull(),
 }));

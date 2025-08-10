@@ -2,7 +2,7 @@ import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod/v4";
 
 import { and, eq } from "@acme/db";
-import { UserPreferences, member, organization } from "@acme/db/schema";
+import { UserPreferences, member, organization, user } from "@acme/db/schema";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
@@ -26,8 +26,17 @@ export const organizationRouter = {
     const memberships = await ctx.db
       .select()
       .from(member)
+      .innerJoin(user, eq(member.userId, user.id))
       .where(eq(member.userId, userId));
     return memberships;
+  }),
+
+  members: protectedProcedure.query(async ({ ctx }) => {
+    const orgId =
+      (ctx.session as any)?.activeOrganizationId ||
+      (ctx.session as any)?.session?.activeOrganizationId;
+    const members = await ctx.db.select().from(member).innerJoin(user, eq(member.userId, user.id)).where(eq(member.organizationId, orgId));
+    return members;
   }),
 
   setActive: protectedProcedure

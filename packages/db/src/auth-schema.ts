@@ -68,16 +68,16 @@ export const verification = pgTable("verification", {
 });
 
 export const organization = pgTable("organization", {
-  id: text("id").$defaultFn(() => crypto.randomUUID()).primaryKey(),
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   slug: text("slug").unique(),
   logo: text("logo"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").notNull(),
   metadata: text("metadata"),
 });
 
 export const member = pgTable("member", {
-  id: text("id").$defaultFn(() => crypto.randomUUID()).primaryKey(),
+  id: text("id").primaryKey(),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
@@ -86,7 +86,7 @@ export const member = pgTable("member", {
     .references(() => user.id, { onDelete: "cascade" }),
   role: text("role").default("member").notNull(),
   teamId: text("team_id"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").notNull(),
 });
 
 export const invitation = pgTable("invitation", {

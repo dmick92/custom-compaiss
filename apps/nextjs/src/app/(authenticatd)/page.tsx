@@ -234,9 +234,9 @@ export default function HomePage() {
       text: 'Team Management',
       done: false,
       children: [
-        { text: 'Team CRUD operations', done: false },
-        { text: 'Team member invitation and management', done: false },
-        { text: 'Team role assignment (lead, member)', done: false },
+        { text: 'Team CRUD operations', done: true },
+        { text: 'Team member invitation and management', done: true },
+        { text: 'Team role assignment (lead, member)', done: true },
         { text: 'Team settings and configuration', done: false },
         { text: 'Team activity log tracking', done: false },
         { text: 'Team assignment to projects/processes', done: false },
